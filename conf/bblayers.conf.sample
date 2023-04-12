@@ -16,7 +16,7 @@ BBLAYERS ?= " \
   ##OEROOT##/../meta-mediatek-tsn \
   ##OEROOT##/../meta-mediatek-demo \
   ##OEROOT##/../meta-nn \
-  ##OEROOT##/../meta-adlinktech-bsp \
+  ##OEROOT##/../meta-adlink-mtk \
   ##OEROOT##/../meta-stress-test \
   ##OEROOT##/../meta-openembedded/meta-multimedia \
   ##OEROOT##/../meta-openembedded/meta-networking \

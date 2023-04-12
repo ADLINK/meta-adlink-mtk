@@ -53,7 +53,7 @@ while getopts "b:d:s:" o; do
         ;;
     esac
 done
-export TEMPLATECONF=${PWD}/src/meta-adlinktech-bsp/conf/
+export TEMPLATECONF=${PWD}/src/meta-adlink-mtk/conf/
 source src/poky/oe-init-build-env $BUILD_DIR
 export BUILD_DIR=`pwd`
 export DISTRO=rity-demo
