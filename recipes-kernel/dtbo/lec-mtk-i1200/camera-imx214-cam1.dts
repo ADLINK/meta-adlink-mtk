@@ -1,0 +1,99 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (c) 2022 MediaTek Inc.
+ *
+ */
+
+#include <dt-bindings/clock/mt8195-clk.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/mt8195-pinfunc.h>
+
+/dts-v1/;
+/plugin/;
+
+#include "isp70.dtsi"
+#include "mtk-camera.dtsi"
+
+/ {
+	fragment@4 {
+		target = <&i2c1>;
+		__overlay__ {
+			clock-frequency = <400000>;
+
+			sensor0@1a {
+				compatible = "sony,imx214";
+				reg = <0x1a>;
+				status = "okay";
+
+				pinctrl-names = "default";
+				pinctrl-0 = <&camera_pin_cam0>;
+
+				//vdddo-supply = <&mt6359_vcamio_ldo_reg>;
+				//vdda-supply = <&mt6359_vfe28_ldo_reg>;
+				//vddd-supply = <&cam0_dvdd_en>;
+
+				clocks = <&topckgen CLK_TOP_CAMTG>,
+					 <&topckgen CLK_TOP_UNIVPLL_192M_D8>;
+				clock-names = "xvclk", "freq_mux";
+				clock-frequency = <24000000>;
+				assigned-clocks = <&topckgen CLK_TOP_CAMTG>,
+						  <&topckgen CLK_TOP_UNIVPLL_192M_D8>;
+				assigned-clock-parents = <&topckgen CLK_TOP_UNIVPLL_192M_D8>;
+				assigned-clock-rates = <0>, <24000000>;
+
+				enable-gpios = <&pio 58 GPIO_ACTIVE_HIGH>;
+
+				port {
+					sensor0_out: endpoint {
+						remote-endpoint = <&seninf_csi_port_0_in>;
+						data-lanes = <1 2 3 4>;
+						link-frequencies = /bits/ 64 <480000000>;
+					};
+				};
+
+			};
+		};
+	};
+
+	fragment@5 {
+		target = <&seninf_top>;
+		__overlay__ {
+			seninf_csi_port_0: seninf_csi_port_0 {
+				compatible = "mediatek,seninf";
+				csi-port = "0";
+				port {
+					seninf_csi_port_0_in: endpoint {
+						remote-endpoint = <&sensor0_out>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@6 {
+		target = <&pio>;
+		__overlay__ {
+			camera_pin_cam0: cam0@0 {
+				pins_mclk {
+					pinmux = <PINMUX_GPIO22__FUNC_CMMCLK0>;
+					drive-strength = <MTK_DRIVE_2mA>;
+				};
+				pins_reset {
+					pinmux = <PINMUX_GPIO58__FUNC_GPIO58>;	//CAM1_RST
+					output-high;
+				};
+				pins_dvdd_en {
+					pinmux = <PINMUX_GPIO59__FUNC_GPIO59>;	//CAM1_PWR
+					output-high;
+				};
+			};
+		};
+	};
+
+	fragment@7 {
+		target = <&mtkcam0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+};

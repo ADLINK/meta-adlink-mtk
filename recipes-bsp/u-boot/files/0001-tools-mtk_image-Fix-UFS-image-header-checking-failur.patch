@@ -1,0 +1,48 @@
+From afa8b15e7204c18cca07f91138e48cf9d2b53b14 Mon Sep 17 00:00:00 2001
+From: Ramax Lo <ramax.lo@mediatek.com>
+Date: Wed, 14 Dec 2022 14:45:13 +0800
+Subject: [PATCH] tools: mtk_image: Fix UFS image header checking failure
+
+When generating bl2.img, mkimage exits with following error:
+
+====
+$ ./mkimage -T mtk_image -a 0x201000 -e 0x201000 -n "media=ufs;arm64=1" -d bl2.img.tmp bl2.img
+Image Type:   MediaTek BootROM Loadable Image
+Boot Media:   UFS
+./mkimage: Failed to verify header of bl2.img
+====
+
+The reason is that the function mtk_image_verify_ufs_header() doesn't
+correctly parse the image header and raises a false alarm.
+
+The commit updates the function to use correct structure to calculate
+offset of binary for finding magic numbers.
+
+Signed-off-by: Ramax Lo <ramax.lo@mediatek.com>
+---
+ tools/mtk_image.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/mtk_image.c b/tools/mtk_image.c
+index 72cddb513b..2ae81bd4fd 100644
+--- a/tools/mtk_image.c
++++ b/tools/mtk_image.c
+@@ -580,13 +580,13 @@ static int mtk_image_verify_ufs_header(const uint8_t *ptr, int print)
+ 	if (print)
+ 		printf("Boot Media:   %s\n", bootmedia);
+ 
+-	devh_size = sizeof(struct gen_device_header);
++	devh_size = sizeof(struct ufs_device_header);
+ 
+ 	if (le32_to_cpu(gbh->version) != 1 ||
+ 	    le32_to_cpu(gbh->size) != devh_size)
+ 		return -1;
+ 
+-	bh = (struct brom_layout_header *)(ptr + le32_to_cpu(gbh->size));
++	bh = (struct brom_layout_header *)(ptr + sizeof(union gen_boot_header));
+ 
+ 	if (strcmp(bh->name, BRLYT_NAME))
+ 		return -1;
+-- 
+2.38.1
+

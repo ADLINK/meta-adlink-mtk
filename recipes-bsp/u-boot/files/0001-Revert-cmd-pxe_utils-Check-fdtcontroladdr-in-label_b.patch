@@ -1,0 +1,66 @@
+From 3248a8f5637d7a17d12f9cbcf55f61953e8b8594 Mon Sep 17 00:00:00 2001
+From: Alexandre Mergnat <amergnat@baylibre.com>
+Date: Wed, 18 May 2022 09:14:29 +0000
+Subject: [PATCH] Revert "cmd: pxe_utils: Check fdtcontroladdr in label_boot"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This reverts commit d5ba6188dfbf6bb68354bec86e483623f1f6dae2.
+
+Currently, mtk boot flow load the fdt stored in the FIT image to
+start the kernel. The reverted patch add an additional fallback from
+fdtcontroladdr value. Then, even if we don’t give any information to
+target the U-Boot’s DT, U-Boot finally target its own DT before try
+to find one in FIT Image, which is our chosen boot solution.
+Unfortunately, both DTs are different, then kernel can’t boot with
+U-Boot’s DT.
+
+Signed-off-by: Alexandre Mergnat amergnat@baylibre.com
+---
+ boot/pxe_utils.c   | 8 +-------
+ drivers/net/tsec.c | 2 +-
+ 2 files changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/boot/pxe_utils.c b/boot/pxe_utils.c
+index 0c24becae393..1fd783cd6ff6 100644
+--- a/boot/pxe_utils.c
++++ b/boot/pxe_utils.c
+@@ -616,10 +616,7 @@ static int label_boot(struct pxe_context *ctx, struct pxe_label *label)
+ 	 * Scenario 2: If there is an fdt_addr specified, pass it along to
+ 	 * bootm, and adjust argc appropriately.
+ 	 *
+-	 * Scenario 3: If there is an fdtcontroladdr specified, pass it along to
+-	 * bootm, and adjust argc appropriately.
+-	 *
+-	 * Scenario 4: fdt blob is not available.
++	 * Scenario 3: fdt blob is not available.
+ 	 */
+ 	bootm_argv[3] = env_get("fdt_addr_r");
+ 
+@@ -724,9 +721,6 @@ static int label_boot(struct pxe_context *ctx, struct pxe_label *label)
+ 	if (!bootm_argv[3])
+ 		bootm_argv[3] = env_get("fdt_addr");
+ 
+-	if (!bootm_argv[3])
+-		bootm_argv[3] = env_get("fdtcontroladdr");
+-
+ 	if (bootm_argv[3]) {
+ 		if (!bootm_argv[2])
+ 			bootm_argv[2] = "-";
+diff --git a/drivers/net/tsec.c b/drivers/net/tsec.c
+index beca886b256c..3dd00a4a40db 100644
+--- a/drivers/net/tsec.c
++++ b/drivers/net/tsec.c
+@@ -156,7 +156,7 @@ static int tsec_mcast_addr(struct udevice *dev, const u8 *mcast_mac, int join)
+ 	return 0;
+ }
+ 
+-static int __maybe_unused tsec_set_promisc(struct udevice *dev, bool enable)
++static int tsec_set_promisc(struct udevice *dev, bool enable)
+ {
+ 	struct tsec_private *priv = dev_get_priv(dev);
+ 	struct tsec __iomem *regs = priv->regs;
+-- 
+2.36.1
+
