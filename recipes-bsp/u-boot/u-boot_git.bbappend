@@ -12,6 +12,5 @@ SRC_URI += " \
         file://fdt-env.cfg \
 "
 
-S = "${WORKDIR}/u-boot"
 
 UBOOT_LOCALVERSION = "-adlink"
