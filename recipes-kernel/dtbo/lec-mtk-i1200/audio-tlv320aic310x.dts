@@ -3,7 +3,7 @@
 
 / {
 	fragment@0 {
-		target = <&wm8960>;
+		target = <&tlv320aic310x>;
 		__overlay__ {
 			status = "okay";
 		};
@@ -16,7 +16,7 @@
 				sound-dai = <&afe>;
 				dai-link-name = "ETDM1_OUT_BE";
 				codec-0 {
-					sound-dai = <&wm8960>;
+					sound-dai = <&tlv320aic310x>;
 				};
 			};
 		};
