@@ -1,6 +1,9 @@
 FILESEXTRAPATHS:prepend:lec-mtk-i1200-ufs:= "${THISDIR}/lec-mtk-i1200:"
 
 SRC_URI:append:lec-mtk-i1200-ufs = " \
+        file://memory-2G.dts \
+        file://memory-4G.dts \
+        file://memory-8G.dts \
         file://audio-wm8960.dts \
         file://audio-tlv320aic310x.dts \
         file://panel-boe-ne135fbm.dts \
