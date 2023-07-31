@@ -1,0 +1,11 @@
+[Unit]
+Description=Auto Resize
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/root/tools/resize.sh
+StandardOutput=kmsg+console
+
+[Install]
+WantedBy=multi-user.target
