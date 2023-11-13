@@ -22,10 +22,11 @@ DISTRO_FEATURES:remove = " x11 "
 # Mali
 KERNEL_MODULE_AUTOLOAD += "dma-buf-test-exporter"
 MALI_SOC = "mt8183"
-MALI_VERSION ??= "r32p0"
+MALI_VERSION ??= "32"
 
 MACHINE_EXTRA_RRECOMMENDS:append = " \
 	${@bb.utils.contains_any('DISTRO_FEATURES', 'opengl vulkan', 'libmali', '', d)} \
+   	mali-gpu-driver \
 	linux-firmware-mt8183-scp \
 	${@bb.utils.contains("MACHINE_FEATURES", "optee-efuse", "optee-ewriter", "", d)} \
 "
@@ -36,7 +37,8 @@ PREFERRED_PROVIDER_virtual/libgbm ?= "libmali"
 PREFERRED_PROVIDER_virtual/libgl ?= "libmali"
 PREFERRED_PROVIDER_virtual/libgles1 ?= "libmali"
 PREFERRED_PROVIDER_virtual/libgles2 ?= "libmali"
+PREFERRED_PROVIDER_virtual/libgles3 ?= "libmali"
 PREFERRED_PROVIDER_virtual/mesa ?= "libmali"
 PREFERRED_PROVIDER_virtual/opencl ?= "libmali"
 
-MACHINEOVERRIDES =. "mt8385:i500:"
+MACHINEOVERRIDES =. "mt8385:i500:genio-500:"

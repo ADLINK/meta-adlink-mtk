@@ -2,17 +2,17 @@ require conf/machine/include/arm/arch-armv8a.inc
 require conf/machine/include/soc-family.inc
 require mediatek-common.inc
 
-SOC_FAMILY = "mt8195"
+SOC_FAMILY = "mt8370"
 
 # Trusted Firmware-A
-TFA_PLATFORM = "mt8195"
+TFA_PLATFORM = "mt8188"
 
 # OP-TEE
-OPTEE_TARGET = "mediatek-mt8195"
+OPTEE_TARGET = "mediatek-mt8370"
 OPTEE_DRAM_SIZE = "0x80000000"
 
 # LK
-LK_PROJECT = "mt8395-demo"
+LK_PROJECT = "mt8390-evk"
 
 MACHINE_FEATURES:append = " optee"
 MACHINE_FEATURES:append = " ${@bb.utils.contains("DISTRO_FEATURES", "nda-mtk", "optee-efuse", "", d)}"
@@ -20,13 +20,13 @@ MACHINE_FEATURES:append = " ${@bb.utils.contains("DISTRO_FEATURES", "nda-mtk", "
 DISTRO_FEATURES:remove = " x11 "
 
 # Mali
-MALI_SOC = "mt8195"
+MALI_SOC = "mt8188"
 MALI_VERSION ??= "43"
 
 MACHINE_EXTRA_RRECOMMENDS:append = " \
 	${@bb.utils.contains_any('DISTRO_FEATURES', 'opengl vulkan', 'libmali', '', d)} \
 	mali-gpu-driver \
-	linux-firmware-mt8195-scp \
+	linux-firmware-mt8188-scp \
 	${@bb.utils.contains("MACHINE_FEATURES", "optee-efuse", "optee-ewriter", "", d)} \
 "
 
@@ -40,4 +40,4 @@ PREFERRED_PROVIDER_virtual/libgles3 ?= "libmali"
 PREFERRED_PROVIDER_virtual/mesa ?= "libmali"
 PREFERRED_PROVIDER_virtual/opencl ?= "libmali"
 
-MACHINEOVERRIDES =. "mt8395:i1200:genio-1200:"
+MACHINEOVERRIDES =. "mt8370:genio-510:"

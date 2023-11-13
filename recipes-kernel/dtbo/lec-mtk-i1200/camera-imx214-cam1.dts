@@ -21,7 +21,8 @@
 			clock-frequency = <400000>;
 
 			sensor0@1a {
-				compatible = "sony,imx214";
+				compatible = "mediatek,imgsensor";
+				sensor-names = "imx214_mipi_raw";
 				reg = <0x1a>;
 				status = "okay";
 

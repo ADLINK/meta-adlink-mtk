@@ -7,19 +7,19 @@ KERNEL_COMPRESSION = "gzip"
 
 # U-Boot
 UBOOT_SUFFIX = "bin"
-UBOOT_ENTRYPOINT       = "0x40200000"
-UBOOT_LOADADDRESS      = "0x40200000"
+UBOOT_ENTRYPOINT       = "0x64000000"
+UBOOT_LOADADDRESS      = "0x64000000"
 UBOOT_DTB_LOADADDRESS  = "0x44000000"
 UBOOT_DTBO_LOADADDRESS = "0x44c00000"
-UBOOT_SIGN_ENABLE = "1"
+UBOOT_SIGN_ENABLE = "${@bb.utils.contains('DISTRO_FEATURES', 'secure-boot', '1', '0', d)}"
 
 # OP-TEE OS
 PREFERRED_PROVIDER_virtual/optee-os ?= "optee-os"
-PREFERRED_VERSION_optee-client ?= "3.16"
-PREFERRED_VERSION_optee-examples ?= "3.16"
-PREFERRED_VERSION_optee-os ?= "3.16"
-PREFERRED_VERSION_optee-os-tadevkit ?= "3.16"
-PREFERRED_VERSION_optee-test ?= "3.16"
+PREFERRED_VERSION_optee-client ?= "3.19"
+PREFERRED_VERSION_optee-examples ?= "3.19"
+PREFERRED_VERSION_optee-os ?= "3.19"
+PREFERRED_VERSION_optee-os-tadevkit ?= "3.19"
+PREFERRED_VERSION_optee-test ?= "3.19"
 OPTEE_TZDRAM_START ?= "0x43200000"
 OPTEE_TZDRAM_SIZE  ?= "0x00a00000"
 
@@ -54,7 +54,7 @@ PREFERRED_VERSION_linux-mtk ??= "5.15%"
 
 EXTRA_IMAGEDEPENDS = " \
 	virtual/lk \
-	trusted-firmware-a \
+	${@bb.utils.contains("DISTRO_FEATURES", "security", "", "trusted-firmware-a", d)} \
 	rity-tools \
 "
 
@@ -73,15 +73,26 @@ OPTEE_RPMB_TEST_KEY ??= "0"
 
 MACHINE_EXTRA_RRECOMMENDS:append = " ${@bb.utils.contains("DISTRO_FEATURES", "optee-otp", " optee-otp", "", d)}"
 
+# Set this to enable AB boot on fwupdate supported
+AB_FWUPDATE_ENABLE ?= "${@bb.utils.contains("DISTRO_FEATURES", "fwupdate", "1", "0", d)}"
 # Set this to sign BL2 and support DAA
 BL2_SIGN_ENABLE ??= "0"
 DA_SIGN_ENABLE ??= "0"
 
 # Set this to generate the secure package required to enable secure boot
-SECURE_ZIP_ENABLE ??= "0"
+SECURE_ZIP_ENABLE ?= "${@bb.utils.contains("DISTRO_FEATURES", "secure-boot", "1", "0", d)}"
+FIT_SIGN_INDIVIDUAL ?= "${@bb.utils.contains("DISTRO_FEATURES", "secure-boot", "1", "0", d)}"
+FIT_GENERATE_KEYS ?= "${@bb.utils.contains("DISTRO_FEATURES", "secure-boot", "1", "0", d)}"
+UBOOT_SIGN_KEYDIR ?= "${@bb.utils.contains("DISTRO_FEATURES", "secure-boot", "${DEPLOY_DIR_IMAGE}/secure", "", d)}"
+UBOOT_SIGN_KEYNAME ?= "${@bb.utils.contains("DISTRO_FEATURES", "secure-boot", "u-boot", "", d)}"
+UBOOT_SIGN_IMG_KEYNAME ?= "${@bb.utils.contains("DISTRO_FEATURES", "secure-boot", "u-boot-img", "", d)}"
 
 IMAGE_CLASSES:append = "${@oe.utils.conditional('SECURE_ZIP_ENABLE', '1', ' image_type_secure_package', '', d)}"
 IMAGE_FSTYPES:append = "${@oe.utils.conditional('SECURE_ZIP_ENABLE', '1', ' secure.zip', '', d)}"
+
+# Set this to enable rootfs security for verity image
+DM_VERITY_IMAGE ?= "${IMAGE_BASENAME}"
+DM_VERITY_IMAGE_TYPE ?= "ext4"
 
 # Allowed license for mtk device - overrideable if necessary
 MTK_EXTRA_LICENSE_FLAGS_ACCEPTED ?= "commercial"

@@ -23,12 +23,4 @@
 		};
 	};
 
-	fragment@3 {
-		/* DSI0 does not support dualpipe output,
-		   so explicitly disable dualpipe by disabling ovl1 node */
-		target = <&ovl1>;
-		__overlay__ {
-			status = "disabled";
-		};
-	};
 };

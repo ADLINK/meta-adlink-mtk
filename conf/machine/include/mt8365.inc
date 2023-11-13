@@ -20,12 +20,12 @@ MACHINE_FEATURES:append = " ${@bb.utils.contains("DISTRO_FEATURES", "nda-mtk", "
 DISTRO_FEATURES:remove = " x11 "
 
 # Mali
-KERNEL_MODULE_AUTOLOAD += "dma-buf-test-exporter"
 MALI_SOC = "mt8365"
-MALI_VERSION ??= "r32p0"
+MALI_VERSION ??= "43"
 
 MACHINE_EXTRA_RRECOMMENDS:append = " \
 	${@bb.utils.contains_any('DISTRO_FEATURES', 'opengl vulkan', 'libmali', '', d)} \
+	mali-gpu-driver \
 	${@bb.utils.contains("MACHINE_FEATURES", "optee-efuse", "optee-ewriter", "", d)} \
 "
 
@@ -35,9 +35,10 @@ PREFERRED_PROVIDER_virtual/libgbm ?= "libmali"
 PREFERRED_PROVIDER_virtual/libgl ?= "libmali"
 PREFERRED_PROVIDER_virtual/libgles1 ?= "libmali"
 PREFERRED_PROVIDER_virtual/libgles2 ?= "libmali"
+PREFERRED_PROVIDER_virtual/libgles3 ?= "libmali"
 PREFERRED_PROVIDER_virtual/mesa ?= "libmali"
 PREFERRED_PROVIDER_virtual/opencl ?= "libmali"
 
-PREFERRED_RPROVIDER_virtual/mdpd ??= "${@bb.utils.contains("DISTRO_FEATURES", "nda-mtk", "mtk-mdpd", "mdp-prebuilt", d)}"
+PREFERRED_RPROVIDER_virtual/mdpd ?= "${@bb.utils.contains("DISTRO_FEATURES", "nda-mtk", "mtk-mdpd", "mdp-prebuilt", d)}"
 
 MACHINEOVERRIDES =. "i350:genio-350:"

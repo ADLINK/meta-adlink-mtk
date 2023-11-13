@@ -20,13 +20,13 @@ MACHINE_FEATURES:append = " ${@bb.utils.contains("DISTRO_FEATURES", "nda-mtk", "
 DISTRO_FEATURES:remove = " x11 "
 
 # Mali
-KERNEL_MODULE_AUTOLOAD += "dma-buf-test-exporter"
-MALI_SOC = "mt8195"
-MALI_VERSION ??= "r32p0"
+MALI_SOC = "mt8188"
+MALI_VERSION ??= "43"
 
 MACHINE_EXTRA_RRECOMMENDS:append = " \
 	${@bb.utils.contains_any('DISTRO_FEATURES', 'opengl vulkan', 'libmali', '', d)} \
-	linux-firmware-mt8195-scp \
+	mali-gpu-driver \
+	linux-firmware-mt8188-scp \
 	${@bb.utils.contains("MACHINE_FEATURES", "optee-efuse", "optee-ewriter", "", d)} \
 "
 
@@ -36,6 +36,7 @@ PREFERRED_PROVIDER_virtual/libgbm ?= "libmali"
 PREFERRED_PROVIDER_virtual/libgl ?= "libmali"
 PREFERRED_PROVIDER_virtual/libgles1 ?= "libmali"
 PREFERRED_PROVIDER_virtual/libgles2 ?= "libmali"
+PREFERRED_PROVIDER_virtual/libgles3 ?= "libmali"
 PREFERRED_PROVIDER_virtual/mesa ?= "libmali"
 PREFERRED_PROVIDER_virtual/opencl ?= "libmali"
 

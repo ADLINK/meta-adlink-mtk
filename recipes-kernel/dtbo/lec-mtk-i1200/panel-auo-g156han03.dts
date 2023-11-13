@@ -22,6 +22,8 @@
 		target-path = "/";
 		__overlay__ {
 			edp_panel: panel {
+				compatible = "auo,g156han03";
+				label = "AUO G156HAN03";
 				status = "okay";
 			};
 		};
