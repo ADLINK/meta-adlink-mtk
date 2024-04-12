@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRCBRANCH = "rity-kirkstone-v23.1"
 SRC_URI = "git://git@github.com/ADLINK/linux-mtk.git;protocol=ssh;branch=${SRCBRANCH}"
-SRCREV = "3v1"
+SRCREV = "46df40f59c41e82e70f46e98099b523d75694ddd"
 
 SRC_URI:append:lec-mtk-i1200-ufs = " \
         file://0001-GENIO-media-i2c-modify-imx214-to-support-extra-exten.patch \
