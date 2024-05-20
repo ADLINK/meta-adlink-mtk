@@ -50,6 +50,7 @@ SRC_URI:append:lec-mtk-i1200-ufs = " \
         file://camera-imx214-cam0.dts \
         file://camera-imx214-cam1.dts \
         file://camera-imx214-cam2.dts \
+        file://temp-er.dts \
 "
 
 COMPATIBLE_MACHINE = "lec*"
