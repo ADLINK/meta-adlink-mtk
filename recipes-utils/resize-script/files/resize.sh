@@ -16,6 +16,7 @@ if [ "${PARTITION_END}" == "${DEVICE_SIZE}" ]; then
 else
     # If not, fix partition table and expand the filesystem
     yes Fix | parted ---pretend-input-tty ${DEVICE} print
+    touch /forcefsck
     parted ${DEVICE} resizepart ${NUM} 100%
     resize2fs ${PARTITION}
 fi
