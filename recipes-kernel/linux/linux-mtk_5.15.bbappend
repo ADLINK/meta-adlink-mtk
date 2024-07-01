@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRCBRANCH = "rity-kirkstone-v23.1"
 SRC_URI = "git://git@github.com/ADLINK/linux-mtk.git;protocol=ssh;branch=${SRCBRANCH}"
-SRCREV = "3v1"
+SRCREV = "3v2"
 
 SRC_URI:append:lec-mtk-i1200-ufs = " \
         file://0001-GENIO-media-i2c-modify-imx214-to-support-extra-exten.patch \
@@ -12,7 +12,7 @@ SRC_URI:append:lec-mtk-i1200-ufs = " \
 "
 
 
-LINUX_VERSION_EXTENSION = "-lecmtki1200-3v1"
+LINUX_VERSION_EXTENSION = "-lecmtki1200-3v2"
 
 addtask copy_defconfig after do_kernel_configme before do_configure
 
