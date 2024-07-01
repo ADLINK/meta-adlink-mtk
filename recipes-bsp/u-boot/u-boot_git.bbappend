@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRCBRANCH = "rity-kirkstone-v23.1"
 SRC_URI = "git://git@github.com/ADLINK/u-boot-mtk.git;protocol=ssh;branch=${SRCBRANCH}"
-SRCREV = "3v2"
+SRCREV = "3v3"
 
 SRC_URI += " \
         file://0001-Revert-cmd-pxe_utils-Check-fdtcontroladdr-in-label_b.patch \
