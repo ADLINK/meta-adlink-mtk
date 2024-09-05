@@ -1,6 +1,6 @@
-FILESEXTRAPATHS:prepend:lec-mtk-i1200-ufs:= "${THISDIR}/lec-mtk-i1200:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/lec-mtk-i1200:"
 
-SRC_URI:remove:lec-mtk-i1200-ufs = " \
+SRC_URI:remove = " \
 	file://panel-raspberrypi.dtsi \
         file://display-edp.dts \
         file://display-edp2lvds.dts \
@@ -35,7 +35,7 @@ SRC_URI:remove:lec-mtk-i1200-ufs = " \
 "
 
 
-SRC_URI:append:lec-mtk-i1200-ufs = " \
+SRC_URI:append = " \
         file://memory-2G.dts \
         file://memory-4G.dts \
         file://memory-8G.dts \
@@ -50,7 +50,6 @@ SRC_URI:append:lec-mtk-i1200-ufs = " \
         file://camera-imx214-cam0.dts \
         file://camera-imx214-cam1.dts \
         file://camera-imx214-cam2.dts \
-        file://temp-er.dts \
 "
 
 COMPATIBLE_MACHINE = "lec*"
