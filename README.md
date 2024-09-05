@@ -24,5 +24,5 @@ You can follow the same steps to build your own customized BSP based on your int
 
 # 4. Software Documentation
 
-Refer to the [wiki](https://github.com/ADLINK/meta-adlink-MTK/wiki) page for instructions on building the Yocto as well as flashing the image.
+Refer to the [ipi-wiki](https://www.ipi.wiki/pages/1200-docs?page=HowToBuildYocto.html) page for instructions on building the Yocto as well as flashing the image.
 
