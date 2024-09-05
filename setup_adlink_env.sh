@@ -53,10 +53,11 @@ while getopts "b:d:s:" o; do
         ;;
     esac
 done
-export TEMPLATECONF=${PWD}/src/meta-adlink-mtk/conf/
+export TEMPLATECONF=${PWD}/src/meta-adlink-mtk/conf/templates/
 source src/poky/oe-init-build-env $BUILD_DIR
 export BUILD_DIR=`pwd`
 export DISTRO=rity-demo
 export MACHINE=lec-mtk-i1200-ufs
 export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS DL_DIR SSTATE_DIR"
+grep "NDA" ${BUILD_DIR}/conf/local.conf > /dev/null 2>&1 || echo NDA_BUILD = \"1\" >> ${BUILD_DIR}/conf/local.conf 
 
