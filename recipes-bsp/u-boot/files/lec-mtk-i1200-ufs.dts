@@ -1,0 +1,364 @@
+// SPDX-License-Identifier: GPL-2.0 OR MIT
+/*
+ * Copyright (C) 2021 BayLibre SAS.
+ * Author: Fabien Parent <fparent@baylibre.com>
+ */
+
+/dts-v1/;
+
+#include <config.h>
+#include "mt8195.dtsi"
+
+/ {
+	model = "LEC-MTK-i1200";
+	compatible = "mediatek,genio-1200-evk-ufs", "mediatek,mt8195";
+
+	memory@40000000 {
+		device_type = "memory";
+		reg = <0 0x40000000 0 0x80000000>;
+	};
+
+	firmware: firmware {
+		optee {
+			compatible = "linaro,optee-tz";
+			method = "smc";
+		};
+
+		psci: psci {
+			compatible = "arm,psci-1.0";
+			method = "smc";
+		};
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/* 2 MiB reserved for ARM Trusted Firmware (BL31) */
+		bl31_secmon_reserved: secmon@54600000 {
+			no-map;
+			reg = <0 0x54600000 0x0 0x200000>;
+		};
+
+		/* 12 MiB reserved for OP-TEE (BL32)
+		 * +-----------------------+ 0x43e0_0000
+		 * |      SHMEM 2MiB       |
+		 * +-----------------------+ 0x43c0_0000
+		 * |        | TA_RAM  8MiB |
+		 * + TZDRAM +--------------+ 0x4340_0000
+		 * |        | TEE_RAM 2MiB |
+		 * +-----------------------+ 0x4320_0000
+		 */
+		optee_reserved: optee@43200000 {
+			no-map;
+			reg = <0 0x43200000 0 0x00c00000>;
+		};
+
+		dsi_reserved: dsi@60000000 {
+			reg = <0 0x60000000 0 0x02000000>;
+			no-map;
+		};
+	};
+
+	chosen {
+		stdout-path = &uart0;
+	};
+
+	reg_1p8v: regulator-1p8v {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-1.8V";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+
+	reg_3p3v: regulator-3p3v {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-3.3V";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+	
+        board-detect {
+                compatible = "solidrun,hummingboard-detect";
+                detect-gpios = <&gpio 3 GPIO_ACTIVE_LOW>;   //phy en
+
+        };
+
+
+	dsi0: dsi0{
+		compatible = "mediatek,mt8195-dsi";
+		reg = <0 0x60000000 0 0x02000000>;	
+	        pinctrl-names = "default";
+	        pinctrl-0 = <&panel_pins_default>;
+		reset-gpios = <&gpio 108 GPIO_ACTIVE_HIGH>;
+	        dcdc-gpios = <&gpio 95 GPIO_ACTIVE_HIGH>;
+	        enable-gpios = <&gpio 96 GPIO_ACTIVE_HIGH>;
+		clocks = <&topckgen CLK_TOP_DISP_PWM0>,
+			<&infracfg_ao CLK_INFRA_AO_DISP_PWM>;
+		clock-names = "main", "mm";
+		status = "okay";
+	};
+
+};
+
+&pio {
+	i2c0_pins: i2c0 {
+		pinmux = <PINMUX_GPIO8__FUNC_SDA0>,
+			 <PINMUX_GPIO9__FUNC_SCL0>;
+		input-enable;
+		bias-pull-up;
+	};
+
+	i2c1_pins: i2c1 {
+		pinmux = <PINMUX_GPIO10__FUNC_SDA1>,
+			 <PINMUX_GPIO11__FUNC_SCL1>;
+		input-enable;
+		bias-pull-up;
+	};
+
+	i2c2_pins: i2c2 {
+		pinmux = <PINMUX_GPIO12__FUNC_SDA2>,
+			 <PINMUX_GPIO13__FUNC_SCL2>;
+		input-enable;
+		bias-pull-up;
+	};
+
+	i2c3_pins: i2c3 {
+		pinmux = <PINMUX_GPIO14__FUNC_SDA3>,
+			 <PINMUX_GPIO15__FUNC_SCL3>;
+		input-enable;
+		bias-pull-up;
+	};
+
+	i2c4_pins: i2c4 {
+		pinmux = <PINMUX_GPIO16__FUNC_SDA4>,
+			 <PINMUX_GPIO17__FUNC_SCL4>;
+		input-enable;
+		bias-pull-up;
+	};
+
+	i2c6_pins: i2c6 {
+		pinmux = <PINMUX_GPIO25__FUNC_SDA6>,
+			 <PINMUX_GPIO26__FUNC_SCL6>;
+		input-enable;
+		bias-pull-up;
+	};
+
+	ethdefault: ethdefault {
+		txdpins {
+			pinmux = <PINMUX_GPIO77__FUNC_GBE_TXD3>,
+				 <PINMUX_GPIO78__FUNC_GBE_TXD2>,
+				 <PINMUX_GPIO79__FUNC_GBE_TXD1>,
+				 <PINMUX_GPIO80__FUNC_GBE_TXD0>;
+			drive-strength = <MTK_DRIVE_8mA>;
+		};
+		ccpins {
+			pinmux = <PINMUX_GPIO85__FUNC_GBE_TXC>,
+				 <PINMUX_GPIO88__FUNC_GBE_TXEN>,
+				 <PINMUX_GPIO87__FUNC_GBE_RXDV>,
+				 <PINMUX_GPIO86__FUNC_GBE_RXC>;
+			drive-strength = <MTK_DRIVE_8mA>;
+		};
+		rxdpins {
+			pinmux = <PINMUX_GPIO81__FUNC_GBE_RXD3>,
+				 <PINMUX_GPIO82__FUNC_GBE_RXD2>,
+				 <PINMUX_GPIO83__FUNC_GBE_RXD1>,
+				 <PINMUX_GPIO84__FUNC_GBE_RXD0>;
+		};
+		mdiopins {
+			pinmux = <PINMUX_GPIO89__FUNC_GBE_MDC>,
+				 <PINMUX_GPIO90__FUNC_GBE_MDIO>;
+			input-enable;
+		};
+		phyresetpin {
+			pinmux = <PINMUX_GPIO93__FUNC_GPIO93>;
+		};
+		phy_intr_pin {
+                        pinmux = <PINMUX_GPIO94__FUNC_GPIO94>;
+                };
+
+	};
+
+	ethsleep: ethsleep {
+		txdpins {
+			pinmux = <PINMUX_GPIO77__FUNC_GPIO77>,
+				 <PINMUX_GPIO78__FUNC_GPIO78>,
+				 <PINMUX_GPIO79__FUNC_GPIO79>,
+				 <PINMUX_GPIO80__FUNC_GPIO80>;
+		};
+		ccpins {
+			pinmux = <PINMUX_GPIO85__FUNC_GPIO85>,
+				 <PINMUX_GPIO88__FUNC_GPIO88>,
+				 <PINMUX_GPIO87__FUNC_GPIO87>,
+				 <PINMUX_GPIO86__FUNC_GPIO86>;
+		};
+		rxdpins {
+			pinmux = <PINMUX_GPIO81__FUNC_GPIO81>,
+				 <PINMUX_GPIO82__FUNC_GPIO82>,
+				 <PINMUX_GPIO83__FUNC_GPIO83>,
+				 <PINMUX_GPIO84__FUNC_GPIO84>;
+		};
+		mdiopins {
+			pinmux = <PINMUX_GPIO89__FUNC_GPIO89>,
+				 <PINMUX_GPIO90__FUNC_GPIO90>;
+			input-disable;
+			bias-disable;
+		};
+		phyresetpin {
+			pinmux = <PINMUX_GPIO93__FUNC_GPIO93>;
+			input-disable;
+			bias-disable;
+		};
+	};
+
+	panel_pins_default: panel-pins-default {
+		panel-dcdc {
+			pinmux = <PINMUX_GPIO95__FUNC_GPIO95>;
+			output-low;
+		};
+
+		panel-en {
+			pinmux = <PINMUX_GPIO96__FUNC_GPIO96>;
+			output-low;
+		};
+
+		panel-rst {
+			pinmux = <PINMUX_GPIO108__FUNC_GPIO108>;
+			output-high;
+		};
+
+		pins-bl {
+			pinmux = <PINMUX_GPIO97__FUNC_DISP_PWM0>;
+		};
+	};
+ 	   panel0_en_pin: panel-en-pin {
+                 pins_cmd_dat {
+                     pinmux = <PINMUX_GPIO96__FUNC_GPIO96>;
+                 };
+         };
+
+		usb_p0_pins: usb_p0_pins {
+                pin_iddig {
+                        pinmux = <PINMUX_GPIO128__FUNC_IDDIG>;
+                        input-enable;
+                        bias-pull-up;
+                };
+                pins_cmd_dat {
+                        pinmux = <PINMUX_GPIO63__FUNC_VBUSVALID>;
+                        input-enable;
+                        bias-pull-up;
+                };
+        };
+
+
+};
+
+&watchdog {
+	status = "okay";
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&ufs {
+	status = "okay";
+};
+
+&usb {
+	status = "okay";
+};
+
+&ssusb {
+        pinctrl-0 = <&usb_p0_pins>;
+        pinctrl-names = "default";
+	mediatek,force-vbus;
+	maximum-speed = "high-speed";
+	dr_mode = "host";
+	status = "okay";
+};
+
+&xhci0 {
+	status = "okay";
+};
+
+&xhci1 {
+	status = "disabled";
+};
+
+&xhci3 {
+	status = "okay";
+};
+
+&i2c0 {
+	clock-frequency = <100000>;
+	pinctrl-0 = <&i2c0_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&i2c1 {
+	clock-frequency = <100000>;
+	pinctrl-0 = <&i2c1_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&i2c2 {
+	clock-frequency = <100000>;
+	pinctrl-0 = <&i2c2_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&i2c3 {
+	clock-frequency = <100000>;
+	pinctrl-0 = <&i2c3_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&i2c4 {
+	clock-frequency = <100000>;
+	pinctrl-0 = <&i2c4_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&i2c6 {
+	clock-frequency = <100000>;
+	pinctrl-0 = <&i2c6_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&eth {
+
+        phy-mode ="rgmii-rxid";
+        phy-handle = <&ethphy0>;
+        mediatek,tx-delay-ps = <2030>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&ethdefault>;
+        status = "okay";
+
+        mdio {
+                #address-cells = <1>;
+                #size-cells = <0>;
+                ethphy0: ethphy0@0 {
+                        compatible = "ethernet-phy-ieee802.3-c22";
+                        reg = <0x0>;
+                                ti,rx-internal-delay = <0x8>;
+                                ti,tx-internal-delay = <0xb>;
+                                ti,fifo-depth = <0x01>;
+                                ti,clk-output-sel = <0xFFFFFFFF>;
+
+                };
+        };
+
+};
+

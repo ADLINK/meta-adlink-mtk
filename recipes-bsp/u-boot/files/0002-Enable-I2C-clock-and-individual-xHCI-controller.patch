@@ -1,0 +1,91 @@
+From 0457921040ff5bda57d0df12d473c49a09059932 Mon Sep 17 00:00:00 2001
+From: "deepak.s" <deepak.s@adlinktech.com>
+Date: Tue, 27 Aug 2024 11:37:19 +0530
+Subject: [PATCH] Enable I2C clock and individual xHCI controller bringup
+ support
+
+---
+ drivers/clk/mediatek/Makefile |  3 +++
+ drivers/usb/host/xhci.c       | 24 +++++++++++++++++-------
+ include/usb/xhci.h            |  1 +
+ 3 files changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefile
+index 2670c375b7..8b42b448de 100644
+--- a/drivers/clk/mediatek/Makefile
++++ b/drivers/clk/mediatek/Makefile
+@@ -11,6 +11,9 @@ obj-$(CONFIG_TARGET_MT8183) += clk-mt8183.o
+ obj-$(CONFIG_TARGET_MT8195) += clk-mt8195.o clk-mt8195-apmixedsys.o \
+ 			       clk-mt8195-topckgen.o clk-mt8195-infra_ao.o \
+ 			       clk-mt8195-imp_iic_wrap.o clk-mt8195-peri_ao.o
++obj-$(CONFIG_TARGET_LEC_MTK_I1200) += clk-mt8195.o clk-mt8195-apmixedsys.o \
++                               clk-mt8195-topckgen.o clk-mt8195-infra_ao.o \
++                               clk-mt8195-imp_iic_wrap.o clk-mt8195-peri_ao.o
+ obj-$(CONFIG_TARGET_MT8365) += clk-mt8365.o
+ obj-$(CONFIG_TARGET_MT8516) += clk-mt8516.o
+ obj-$(CONFIG_TARGET_MT8518) += clk-mt8518.o
+diff --git a/drivers/usb/host/xhci.c b/drivers/usb/host/xhci.c
+index dbeb88afe3..58fe49d3ac 100644
+--- a/drivers/usb/host/xhci.c
++++ b/drivers/usb/host/xhci.c
+@@ -942,7 +942,8 @@ static int xhci_submit_root(struct usb_device *udev, unsigned long pipe,
+ 		case USB_DT_HUB:
+ 		case USB_DT_SS_HUB:
+ 			debug("USB_DT_HUB config\n");
+-			srcptr = &descriptor.hub;
++//			srcptr = &descriptor.hub;
++			srcptr = &ctrl->hub_desc;
+ 			srclen = 0x8;
+ 			break;
+ 		default:
+@@ -1202,20 +1203,29 @@ static int xhci_lowlevel_init(struct xhci_ctrl *ctrl)
+ 	if (xhci_mem_init(ctrl, hccr, hcor) < 0)
+ 		return -ENOMEM;
+ 
++	ctrl->hub_desc = descriptor.hub;
++
+ 	reg = xhci_readl(&hccr->cr_hcsparams1);
+-	descriptor.hub.bNbrPorts = HCS_MAX_PORTS(reg);
+-	printf("Register %x NbrPorts %d\n", reg, descriptor.hub.bNbrPorts);
++//	descriptor.hub.bNbrPorts = HCS_MAX_PORTS(reg);
++//	printf("Register %x NbrPorts %d\n", reg, descriptor.hub.bNbrPorts);
++
++	ctrl->hub_desc.bNbrPorts = HCS_MAX_PORTS(reg);
++	printf("Register %x NbrPorts %d\n", reg, ctrl->hub_desc.bNbrPorts);
+ 
+ 	/* Port Indicators */
+ 	reg = xhci_readl(&hccr->cr_hccparams);
+ 	if (HCS_INDICATOR(reg))
+-		put_unaligned(get_unaligned(&descriptor.hub.wHubCharacteristics)
+-				| 0x80, &descriptor.hub.wHubCharacteristics);
++		put_unaligned(get_unaligned(&ctrl->hub_desc.wHubCharacteristics)
++				| 0x80, &ctrl->hub_desc.wHubCharacteristics);
++//		put_unaligned(get_unaligned(&descriptor.hub.wHubCharacteristics)
++//				| 0x80, &descriptor.hub.wHubCharacteristics);
+ 
+ 	/* Port Power Control */
+ 	if (HCC_PPC(reg))
+-		put_unaligned(get_unaligned(&descriptor.hub.wHubCharacteristics)
+-				| 0x01, &descriptor.hub.wHubCharacteristics);
++		put_unaligned(get_unaligned(&ctrl->hub_desc.wHubCharacteristics)
++				| 0x01, &ctrl->hub_desc.wHubCharacteristics);
++//		put_unaligned(get_unaligned(&descriptor.hub.wHubCharacteristics)
++//				| 0x01, &descriptor.hub.wHubCharacteristics);
+ 
+ 	if (xhci_start(hcor)) {
+ 		xhci_reset(hcor);
+diff --git a/include/usb/xhci.h b/include/usb/xhci.h
+index ea4cf3f52b..85b000e4ad 100644
+--- a/include/usb/xhci.h
++++ b/include/usb/xhci.h
+@@ -1214,6 +1214,7 @@ struct xhci_ctrl {
+ 	struct xhci_erst_entry entry[ERST_NUM_SEGS];
+ 	struct xhci_scratchpad *scratchpad;
+ 	struct xhci_virt_device *devs[MAX_HC_SLOTS];
++	struct usb_hub_descriptor hub_desc;
+ 	int rootdev;
+ 	u16 hci_version;
+ 	u32 quirks;
+-- 
+2.45.2
+
