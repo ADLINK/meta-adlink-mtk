@@ -1,7 +1,7 @@
-From d2823b5a46cf6f0e0f235667140655c48bad2178 Mon Sep 17 00:00:00 2001
+From e5b5ef2ba72cd43498b31e4a9235747d6d68eb2a Mon Sep 17 00:00:00 2001
 From: "deepak.s" <deepak.s@adlinktech.com>
-Date: Tue, 27 Aug 2024 11:32:05 +0530
-Subject: [PATCH] Added Board support for LEC-MTK-i1200
+Date: Mon, 16 Sep 2024 12:26:53 +0530
+Subject: [PATCH] Added Board support for LEC MTK i1200
 
 ---
  arch/arm/dts/Makefile                         |   1 +
@@ -12,10 +12,10 @@ Subject: [PATCH] Added Board support for LEC-MTK-i1200
  arch/arm/mach-mediatek/lec_mtk_i1200/init.c   |  99 ++++++
  board/mediatek/lec_mtk_i1200/MAINTAINERS      |   6 +
  board/mediatek/lec_mtk_i1200/Makefile         |   8 +
- board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c  | 302 ++++++++++++++++++
+ board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c  | 304 ++++++++++++++++++
  .../mediatek/lec_mtk_i1200/mt8195_evk_panel.c | 247 ++++++++++++++
  include/configs/lec_mtk_i1200.h               | 126 ++++++++
- 11 files changed, 813 insertions(+), 1 deletion(-)
+ 11 files changed, 815 insertions(+), 1 deletion(-)
  create mode 100755 arch/arm/mach-mediatek/lec_mtk_i1200/Kconfig
  create mode 100755 arch/arm/mach-mediatek/lec_mtk_i1200/Makefile
  create mode 100755 arch/arm/mach-mediatek/lec_mtk_i1200/init.c
@@ -250,10 +250,10 @@ index 0000000000..1006e7c938
 +endif
 diff --git a/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c b/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
 new file mode 100755
-index 0000000000..4958fb4f3f
+index 0000000000..8a741a5212
 --- /dev/null
 +++ b/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
-@@ -0,0 +1,302 @@
+@@ -0,0 +1,304 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2020 BayLibre SAS
@@ -443,20 +443,23 @@ index 0000000000..4958fb4f3f
 +    {3, "LEC-MTK-I1200-2G-64G-BW-CT(300E)", "conf-memory-2G.dtbo"},
 +    {4, "LEC-MTK-I1200-4G-64G-BW-CT(400E)", "conf-memory-4G.dtbo"},
 +    {5, "LEC-MTK-I1200-8G-64G-BW-CT(500E)", "conf-memory-8G.dtbo"},
-+    {6, "LEC-MTK-I1200-4G-64G-BW-ER(600E)", "conf-memory-4G.dtbo"},
-+    {7, "LEC-MTK-I1200-8G-64G-BW-ER(700E)", "conf-memory-8G.dtbo"},
-+    {8, "LEC-MTK-I1200-8G-128G-BW-ER(800E)", "conf-memory-8G.dtbo"}
++    {6, "LEC-MTK-I1200-4G-64G-BW-ER(600E)", "conf-memory-4G.dtbo#conf-temp-er.dtbo"},
++    {7, "LEC-MTK-I1200-8G-64G-BW-ER(700E)", "conf-memory-8G.dtbo#conf-temp-er.dtbo"},
++    {8, "LEC-MTK-I1200-8G-128G-BW-ER(800E)", "conf-memory-8G.dtbo#conf-temp-er.dtbo"},
++    {9, "LEC-MTK-I1200-4G-64G-ER(TBD)", "conf-memory-4G.dtbo#conf-temp-er.dtbo"},
++    {10, "LEC-MTK-I1200-8G-64G-ER(TBD)", "conf-memory-8G.dtbo#conf-temp-er.dtbo"},
++    {11, "LEC-MTK-I1200-8G-128G-ER(710E)", "conf-memory-8G.dtbo#conf-temp-er.dtbo"}
 +};
 +
 +#define PCB_REG			0x10005230
 +#define PCB_BIT0 20
 +#define PCB_BIT1 21
 +
-+#define PCB_PUPD_REG 	0x11F40030
-+#define PCB_PUPD_BIT0	9
-+#define PCB_PUPD_BIT1	8
++#define PCB_R0_CFG_REG   0x11F40070
++#define PCB_R0_CFG_BIT0  9
++#define PCB_R0_CFG_BIT1  8
 +#define SX150		0x3f
-+static struct gpio_desc board_detect_desc[5];
++static struct gpio_desc board_usb_detect[5];
 +
 +static void board_usbgpio_init(void)
 +{
@@ -466,15 +469,15 @@ index 0000000000..4958fb4f3f
 +	/*USB_P0_P2_MUX_SEL*/
 +
 +        node = fdt_node_offset_by_compatible(gd->fdt_blob, 0,
-+                "solidrun,hummingboard-detect");
++                "adlink-gpio");
 +        if (node < 0){
 +                printf("%s: Can't lookup gpio name \n", __func__);
 +                return -ENODEV;
 +	}
 +
 +        ret = gpio_request_list_by_name_nodev(offset_to_ofnode(node),
-+                "detect-gpios", board_detect_desc,
-+                ARRAY_SIZE(board_detect_desc), GPIOD_IS_OUT);
++                "enable-gpios", board_usb_detect,
++                ARRAY_SIZE(board_usb_detect), GPIOD_IS_OUT);
 +
 +        if (ret < 0){
 +                printf("%s: Can't lookup gpio  \n", __func__);
@@ -493,7 +496,7 @@ index 0000000000..4958fb4f3f
 +int board_late_init(void)
 +{
 +	char *boot_conf_orig = env_get("boot_conf");
-+	char cmd[128];
++	char cmd[256];
 +
 +    uint32_t sku_id_0 = (*(volatile uint32_t *)SKU_REG >> SKU_BIT0) & 0x1;
 +    uint32_t sku_id_1 = (*(volatile uint32_t *)SKU_REG >> SKU_BIT1) & 0x1;
@@ -506,10 +509,10 @@ index 0000000000..4958fb4f3f
 +    int i;
 +    for (i = 0; i < sizeof(skus)/sizeof(struct sku_info); i++) {
 +        if (skus[i].sku_id == sku_id) {
-+            printf("SKU:   %s\n", skus[i].sku_str);
-+			snprintf(cmd, sizeof(cmd), "setenv boot_conf '%s#%s'", boot_conf_orig, skus[i].dtbo_file);
-+			run_command(cmd, 0);
-+            break;
++		printf("SKU:   %s\n", skus[i].sku_str);
++		snprintf(cmd, sizeof(cmd), "setenv boot_conf '%s#%s'", boot_conf_orig, skus[i].dtbo_file);
++		run_command(cmd, 0);
++		break;
 +        }
 +    }
 +
@@ -520,14 +523,14 @@ index 0000000000..4958fb4f3f
 +    uint32_t reg_value;
 +
 +    /* Read the original value of the register */
-+    reg_value = readl(PCB_PUPD_REG);
++    reg_value = readl(PCB_R0_CFG_REG);
 +
 +    /* Clear bits at positions BIT0 and BIT1 */
-+    reg_value &= ~(1 << PCB_PUPD_BIT0);
-+    reg_value &= ~(1 << PCB_PUPD_BIT1);
++    reg_value &= ~(1 << PCB_R0_CFG_BIT0);
++    reg_value &= ~(1 << PCB_R0_CFG_BIT1);
 +
 +    /* Write back the new value to the register */
-+    writel(reg_value, PCB_PUPD_REG);
++    writel(reg_value, PCB_R0_CFG_REG);
 +
 +    uint32_t pcb_id_0 = (*(volatile uint32_t *)PCB_REG >> PCB_BIT0) & 0x1;
 +    uint32_t pcb_id_1 = (*(volatile uint32_t *)PCB_REG >> PCB_BIT1) & 0x1;
@@ -551,7 +554,6 @@ index 0000000000..4958fb4f3f
 +        printf("Unknown PCB\n");
 +        break;
 +    }
-+	
 +    board_usbgpio_init();
 +    setup_dsi();
 +    return 0;

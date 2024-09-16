@@ -83,9 +83,9 @@
 		regulator-always-on;
 	};
 	
-        board-detect {
-                compatible = "solidrun,hummingboard-detect";
-                detect-gpios = <&gpio 3 GPIO_ACTIVE_LOW>;   //phy en
+        board-usb-detect {
+                compatible = "adlink-gpio";
+                enable-gpios = <&gpio 3 GPIO_ACTIVE_LOW>; //USB_P0_P2_MUX_SEL
 
         };
 
