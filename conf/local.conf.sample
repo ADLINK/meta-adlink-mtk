@@ -281,7 +281,7 @@ LICENSE_FLAGS_ACCEPTED = "commercial"
 # By default the rootfs will just be big enough to fit its content. If you
 # need more space you can set the IMAGE_ROOTFS_EXTRA_SPACE variable to set
 # how much space in kB you need.
-IMAGE_ROOTFS_EXTRA_SPACE = "40000000"
+IMAGE_ROOTFS_EXTRA_SPACE = "200000"
 
 # Uncomment to enable multilib support
 #require conf/multilib.conf
@@ -315,7 +315,5 @@ IMAGE_ROOTFS_EXTRA_SPACE = "40000000"
 #KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD:i300a-pumpkin += "camera-ov5645.dtbo"
 #KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD:i300a-sb30 += "panel-raspberrypi.dtbo"
 #KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD:i300a-coral += "camera-ov5645.dtbo"
+#
 KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD += "gpu-mali.dtbo video.dtbo"
-
-# Uncomment the below line to build the image with the MediaTek NDA Yocto recipes.
-#NDA_BUILD = "1"
