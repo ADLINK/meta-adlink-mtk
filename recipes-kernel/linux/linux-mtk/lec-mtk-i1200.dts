@@ -427,7 +427,7 @@
 			interrupts = <55 IRQ_TYPE_EDGE_FALLING>;
                         ls_oe_ctl: gpio0-cfg {
                                 pins = "gpio0";
-                                output-high;
+                                output-low;
                         };
                         tpm_pp: gpio6-cfg {
                                 pins = "gpio6";
