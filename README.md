@@ -15,6 +15,9 @@ You can follow the same steps to build your own customized BSP based on your int
 
 2. [rity-kirkstone-v23.1](https://github.com/ADLINK/meta-adlink-MTK/tree/rity-kirkstone-v23.1)
 
+3. [rity-kirkstone-v24.1](https://github.com/ADLINK/meta-adlink-MTK/tree/rity-kirkstone-v24.1)
+
+
 
 # 3. Adlink Supported Patches
 
