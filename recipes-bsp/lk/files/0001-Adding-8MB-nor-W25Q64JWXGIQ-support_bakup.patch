@@ -1,0 +1,94 @@
+From a3aff8c3c44d85e2c03591719b2f53fe9cdee2fd Mon Sep 17 00:00:00 2001
+From: AdlinkCCoE <dinesh.v@adlinktech.com>
+Date: Fri, 22 Nov 2024 12:00:01 +0530
+Subject: [PATCH] Adding 8MB nor W25Q64JWXGIQ support
+
+---
+ platform/mediatek/mt8195/spinor/mtk_snfc.c    |  2 +-
+ .../include/target/target.h                   | 34 +++++++++----------
+ 2 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/platform/mediatek/mt8195/spinor/mtk_snfc.c b/platform/mediatek/mt8195/spinor/mtk_snfc.c
+index f6338eda..286e2e66 100644
+--- a/platform/mediatek/mt8195/spinor/mtk_snfc.c
++++ b/platform/mediatek/mt8195/spinor/mtk_snfc.c
+@@ -91,7 +91,7 @@ enum {
+ };
+ 
+ static const struct spi_nor nor_tbl[] = {
+-	{"W25Q64JWIM", 0xEF, 0x80, 0x17, 0x100, 0x1000, 0x800000,  0},
++	{"W25Q64JWXGIQ", 0xEF, 0x60, 0x17, 0x100, 0x1000, 0x800000,  0},
+ 	{"GD25LQ64E", 0xC8, 0x60, 0x17, 0x100, 0x1000, 0x800000,  0},
+ 	{"MX25U256", 0xC2, 0x25, 0x39, 0x100, 0x1000, 0x2000000,  0},
+ };
+diff --git a/target/mt8395-evk-norboot-ufs/include/target/target.h b/target/mt8395-evk-norboot-ufs/include/target/target.h
+index cefc5b39..a583841b 100644
+--- a/target/mt8395-evk-norboot-ufs/include/target/target.h
++++ b/target/mt8395-evk-norboot-ufs/include/target/target.h
+@@ -43,46 +43,46 @@ static struct nor_part_info nor_part[NOR_PARTITIONS_NUM] = {
+     {
+         .name = NOR_PARTITIONS_INDEX0,
+         .offset = 0,
+-        .size = 0x400000,
++        .size = 0x80000,	//512k
+     },
+     {
+         .name = NOR_PARTITIONS_INDEX1,
+-        .offset = 0x400000,
+-        .size = 0x400000,
++        .offset = 0x80000,
++        .size = 0x200000,	//2mb
+     },
+     {
+         .name = NOR_PARTITIONS_INDEX2,
+-        .offset = 0x800000,
+-        .size = 0x400000,
++        .offset = 0x280000,
++        .size = 0x200000,	//2mb
+     },
+     {
+         .name = NOR_PARTITIONS_INDEX3,
+-        .offset = 0xC00000,
+-        .size = 0x400000,
++        .offset = 0x480000,
++        .size = 0x40000,	//256k
+     },
+     {
+         .name = NOR_PARTITIONS_INDEX4,
+-        .offset = 0x1000000,
+-        .size = 0x400000,
++        .offset = 0x484000,
++        .size = 0x40000,	//256k
+     },
+     {
+         .name = NOR_PARTITIONS_INDEX5,
+-        .offset = 0x1400000,
+-        .size = 0x80000,
++        .offset = 0x4C4000,
++        .size = 0x80000,	//512k
+     },
+     {
+         .name = NOR_PARTITIONS_INDEX6,
+-        .offset = 0x1480000,
+-        .size = 0x100000,
++        .offset = 0x544000,
++        .size = 0x40000,	//256k
+     },
+     {
+         .name = NOR_PARTITIONS_INDEX7,
+-        .offset = 0x1580000,
+-        .size = 0x400000,
++        .offset = 0x584000,
++        .size = 0x3e000,	//248k
+     },
+     {
+         .name = NOR_PARTITIONS_INDEX8,
+-        .offset = 0x1980000,
+-        .size = 0x400000,
++        .offset = 0x5C2000,
++        .size = 0x2000,		//8k
+     },
+ };
+-- 
+2.46.0
+

@@ -928,7 +928,7 @@
 		};
 
 		cec: cec@10014000 {
-			compatible = "mediatek,mt8195-cec";
+			compatible = "mediatek,cec2";
 			reg = <0 0x10014000 0 0x100>;
 			interrupts = <GIC_SPI 680 IRQ_TYPE_LEVEL_HIGH 0>;
 		};

@@ -10,8 +10,8 @@
 #include "mt8195.dtsi"
 
 / {
-	model = "LEC-MTK-i1200";
-	compatible = "mediatek,genio-1200-evk-ufs", "mediatek,mt8195";
+	model = "LEC-MTK-i1200 with UFS and QSPI NOR Flash storage";
+	compatible = "mediatek,genio-1200-evk-ufs-qspi", "mediatek,mt8195";
 
 	memory@40000000 {
 		device_type = "memory";
@@ -254,6 +254,22 @@
                         bias-pull-up;
                 };
         };
+	
+	snor_pins: snor-pins {
+		pins-ck-io {
+			pinmux = <PINMUX_GPIO142__FUNC_SPINOR_IO0>,
+				 <PINMUX_GPIO141__FUNC_SPINOR_CK>,
+				 <PINMUX_GPIO143__FUNC_SPINOR_IO1>;
+			drive-strength = <6>;
+			bias-pull-down;
+		};
+
+		pins-cs {
+			pinmux = <PINMUX_GPIO140__FUNC_SPINOR_CS>;
+			drive-strength = <6>;
+			bias-pull-up;
+		};
+	};	
 
 
 };
@@ -264,6 +280,20 @@
 
 &uart0 {
 	status = "okay";
+};
+
+&snor {
+	pinctrl-names = "default";
+	pinctrl-0 = <&snor_pins>;
+	status = "okay";
+
+	spi-flash@0{
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		#spi-tx-bus-width = <1>;
+		#spi-rx-bus-width = <4>;
+		#u-boot,dm-pre-reloc;
+	};
 };
 
 &ufs {

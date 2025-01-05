@@ -32,6 +32,17 @@ SRC_URI:remove = " \
         file://camera-ar0830-ap1302-csi1.dts \
         file://camera-ar0830-ap1302-csi2.dts \
         file://camera-ar0830-ap1302-2lanes-csi0.dts \
+	file://camera-ar0830-ap1302-csi0-ar0830-ap1302-csi2.dts \
+	file://camera-ar0430-ap1302-csi0-std.dts\
+	file://camera-ar0830-ap1302-csi0-std.dts\
+	file://camera-it6510-csi0-std.dts \
+	file://camera-lt6911uxe-csi0-std.dts \
+	file://camera-ag190c-max9286-csi0-std.dts \
+	file://camera-imx214-csi0-ar0830-ap1302-csi1-ar0830-ap1302-csi2.dts \
+	file://camera-imx214-csi0-ar0830-ap1302-csi1.dts \
+	file://camera-imx214-csi0-ar0830-ap1302-csi1-imx214-csi2.dts \
+	file://camera-imx214-csi0-ar0830-ap1302-csi1-ar0830-ap1302-csi2.dts \
+	file://camera-imx214-csi0-ar0830-ap1302-csi2.dts \	
 "
 
 

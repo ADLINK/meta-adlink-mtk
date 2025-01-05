@@ -13,6 +13,8 @@ setenv bootargs " ${bootargs} root=PARTLABEL=rootfs rootwait"
 setenv kerneladdr 0x4A000000
 setenv ipaddr 192.168.96.1
 setenv tftp_srv_ipaddr 192.168.96.20
+setenv storage scsi 
+setenv storage_dev 2
 
 if test "${force_tftpboot}" -eq 1; then
 	tftpboot ${kerneladdr} ${tftp_srv_ipaddr}:fitImage

@@ -1,42 +1,32 @@
-From e5b5ef2ba72cd43498b31e4a9235747d6d68eb2a Mon Sep 17 00:00:00 2001
-From: "deepak.s" <deepak.s@adlinktech.com>
-Date: Mon, 16 Sep 2024 12:26:53 +0530
-Subject: [PATCH] Added Board support for LEC MTK i1200
+From 19da92e2061081343d8ccedcea0201e584d17dc1 Mon Sep 17 00:00:00 2001
+From: Dinesh kumar <dinesh.v@adlinktech.com>
+Date: Thu, 2 Jan 2025 21:25:03 +0530
+Subject: [PATCH 1/2] Added Board support for LEC-MTK-i1200
 
 ---
- arch/arm/dts/Makefile                         |   1 +
  arch/arm/mach-mediatek/Kconfig                |   8 +-
  arch/arm/mach-mediatek/Makefile               |   1 +
  arch/arm/mach-mediatek/lec_mtk_i1200/Kconfig  |  13 +
  arch/arm/mach-mediatek/lec_mtk_i1200/Makefile |   3 +
- arch/arm/mach-mediatek/lec_mtk_i1200/init.c   |  99 ++++++
+ arch/arm/mach-mediatek/lec_mtk_i1200/init.c   |  99 +++++
  board/mediatek/lec_mtk_i1200/MAINTAINERS      |   6 +
  board/mediatek/lec_mtk_i1200/Makefile         |   8 +
- board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c  | 304 ++++++++++++++++++
- .../mediatek/lec_mtk_i1200/mt8195_evk_panel.c | 247 ++++++++++++++
- include/configs/lec_mtk_i1200.h               | 126 ++++++++
- 11 files changed, 815 insertions(+), 1 deletion(-)
+ board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c  | 348 ++++++++++++++++++
+ .../lec_mtk_i1200/mt8195_evk_edp_panel.c      |  49 +++
+ .../mediatek/lec_mtk_i1200/mt8195_evk_panel.c | 247 +++++++++++++
+ include/config_distro_bootcmd.h               |   6 +-
+ include/configs/lec_mtk_i1200.h               | 126 +++++++
+ 12 files changed, 912 insertions(+), 2 deletions(-)
  create mode 100755 arch/arm/mach-mediatek/lec_mtk_i1200/Kconfig
  create mode 100755 arch/arm/mach-mediatek/lec_mtk_i1200/Makefile
  create mode 100755 arch/arm/mach-mediatek/lec_mtk_i1200/init.c
  create mode 100755 board/mediatek/lec_mtk_i1200/MAINTAINERS
  create mode 100755 board/mediatek/lec_mtk_i1200/Makefile
  create mode 100755 board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
+ create mode 100644 board/mediatek/lec_mtk_i1200/mt8195_evk_edp_panel.c
  create mode 100755 board/mediatek/lec_mtk_i1200/mt8195_evk_panel.c
  create mode 100755 include/configs/lec_mtk_i1200.h
 
-diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index e10c5ace83..684be40a13 100644
---- a/arch/arm/dts/Makefile
-+++ b/arch/arm/dts/Makefile
-@@ -1235,6 +1235,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += \
- 	mt7629-rfb.dtb \
- 	mt8183-pumpkin.dtb \
- 	mt8195-demo.dtb \
-+	lec-mtk-i1200-ufs.dtb \
- 	mt8195-evb-ufs.dtb \
- 	mt8365-pumpkin.dtb \
- 	mt8512-bm1-emmc.dtb \
 diff --git a/arch/arm/mach-mediatek/Kconfig b/arch/arm/mach-mediatek/Kconfig
 index 72da07527d..3a1c5d3456 100644
 --- a/arch/arm/mach-mediatek/Kconfig
@@ -119,7 +109,7 @@ index 0000000000..886ab7e4eb
 +obj-y += init.o
 diff --git a/arch/arm/mach-mediatek/lec_mtk_i1200/init.c b/arch/arm/mach-mediatek/lec_mtk_i1200/init.c
 new file mode 100755
-index 0000000000..48c8f8a2a6
+index 0000000000..a99aa7d068
 --- /dev/null
 +++ b/arch/arm/mach-mediatek/lec_mtk_i1200/init.c
 @@ -0,0 +1,99 @@
@@ -199,7 +189,7 @@ index 0000000000..48c8f8a2a6
 +	if (part)
 +		printf("CPU:   MediaTek MT%.4x\n", part);
 +	else
-+		printf("CPU:   MediaTek MT8195\n");
++		printf("CPU:   MediaTek  MT8195\n");
 +	return 0;
 +}
 +
@@ -250,10 +240,10 @@ index 0000000000..1006e7c938
 +endif
 diff --git a/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c b/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
 new file mode 100755
-index 0000000000..8a741a5212
+index 0000000000..faf6a3bb47
 --- /dev/null
 +++ b/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
-@@ -0,0 +1,304 @@
+@@ -0,0 +1,348 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2020 BayLibre SAS
@@ -282,6 +272,10 @@ index 0000000000..8a741a5212
 +#include <dwc3-uboot.h>
 +#include <mmc.h>
 +#include <i2c.h>
++#include <splash.h>
++#include <iot_ab.h>
++
++
 +
 +#define MT8195_UPDATABLE_IMAGES	5
 +
@@ -330,9 +324,9 @@ index 0000000000..8a741a5212
 +	fw_images[1].image_index = MT8195_FIP_IMAGE;
 +	fw_images[2].image_index = MT8195_BL2_IMAGE;
 +	fw_images[3].image_index = MT8195_FW_IMAGE;
-+	fw_images[4].image_index = MT8195_ENV_IMAGE;
++	fw_images[4].image_index = MT8195_ENV_IMAGE; 
 +
-+	if (board_is_mt8195_demo()) {
++	if (board_is_mt8195_demo()) { 
 +		efi_guid_t image_type_guid = MT8195_DEMO_FIT_IMAGE_GUID;
 +		efi_guid_t uboot_image_type_guid = MT8195_DEMO_FIP_IMAGE_GUID;
 +		efi_guid_t bl2_image_type_guid = MT8195_DEMO_BL2_IMAGE_GUID;
@@ -350,7 +344,7 @@ index 0000000000..8a741a5212
 +		fw_images[2].fw_name = u"MT8195-DEMO-BL2";
 +		fw_images[3].fw_name = u"MT8195-DEMO-FW";
 +		fw_images[4].fw_name = u"MT8195-DEMO-ENV";
-+	} else if (board_is_genio_1200_evk()) {
++	} else if (board_is_genio_1200_evk()) { 
 +		efi_guid_t image_type_guid = GENIO_1200_EVK_FIT_IMAGE_GUID;
 +		efi_guid_t uboot_image_type_guid = GENIO_1200_EVK_FIP_IMAGE_GUID;
 +		efi_guid_t bl2_image_type_guid = GENIO_1200_EVK_BL2_IMAGE_GUID;
@@ -368,7 +362,7 @@ index 0000000000..8a741a5212
 +		fw_images[2].fw_name = u"GENIO-1200-EVK-BL2";
 +		fw_images[3].fw_name = u"GENIO-1200-EVK-FW";
 +		fw_images[4].fw_name = u"GENIO-1200-EVK-ENV";
-+	} else if (board_is_genio_1200_evk_ufs()) {
++	} else if (board_is_genio_1200_evk_ufs()) { 
 +		efi_guid_t image_type_guid = GENIO_1200_EVK_UFS_FIT_IMAGE_GUID;
 +		efi_guid_t uboot_image_type_guid = GENIO_1200_EVK_UFS_FIP_IMAGE_GUID;
 +		efi_guid_t bl2_image_type_guid = GENIO_1200_EVK_UFS_BL2_IMAGE_GUID;
@@ -388,7 +382,47 @@ index 0000000000..8a741a5212
 +		fw_images[4].fw_name = u"GENIO-1200-EVK-UFS-ENV";
 +	}
 +}
++
++#if IS_ENABLED(CONFIG_MEDIATEK_IOT_AB_BOOT_SUPPORT)
++void set_dfu_alt_info(char *interface, char *devstr)
++{
++        char alt[BOOTCTRL_DFU_ALT_LEN] = {0};
++        const char *s = env_get(BOOTCTRL_ENV);
++
++        if (s) {
++                if (!strcmp(s, "a")) {
++                        if (sprintf(alt, update_info.dfu_string, BOOTCTRL_FIP_NUM + PART_BOOT_B,
++                                    BOOTCTRL_FW_NUM + PART_BOOT_B) < 0)
++                                return;
++                } else if (!strcmp(s, "b")) {
++                        if (sprintf(alt, update_info.dfu_string,
++                                    BOOTCTRL_FIP_NUM, BOOTCTRL_FW_NUM) < 0)
++                                return;
++                }
++                env_set("dfu_alt_info", alt);
++        }
++}
++#endif
 +#endif /* CONFIG_EFI_HAVE_CAPSULE_SUPPORT && CONFIG_EFI_PARTITION */
++
++#if IS_ENABLED(CONFIG_SPLASH_SCREEN) && IS_ENABLED(CONFIG_SPI_FLASH)
++static struct splash_location lec_mtk_1200_spi_splash_locations[] = {
++        {
++                .name = "sf",
++                .storage = SPLASH_STORAGE_SF,
++                .flags = SPLASH_STORAGE_RAW,
++                .offset = 0x1580000,
++        },
++};
++
++int splash_screen_prepare(void)
++{
++        return splash_source_load(lec_mtk_1200_spi_splash_locations,
++                                  ARRAY_SIZE(lec_mtk_1200_spi_splash_locations));
++}
++#endif
++        
++
 +
 +int board_init(void)
 +{
@@ -399,7 +433,7 @@ index 0000000000..8a741a5212
 +		ret = uclass_get_device(UCLASS_USB_GADGET_GENERIC, 0, &dev);
 +		if (ret) {
 +			pr_err("%s: Cannot find USB device\n", __func__);
-+			return ret;
++			//return ret;  /*Fix ME later */
 +		}
 +	}
 +
@@ -416,9 +450,9 @@ index 0000000000..8a741a5212
 +	}
 +
 +        if (IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT) &&
-+		    IS_ENABLED(CONFIG_EFI_PARTITION))
-+	mediatek_capsule_update_board_setup();
-+
++		    IS_ENABLED(CONFIG_EFI_PARTITION)) {
++	mediatek_capsule_update_board_setup(); 
++	}
 +	return 0;
 +}
 +
@@ -461,7 +495,7 @@ index 0000000000..8a741a5212
 +#define SX150		0x3f
 +static struct gpio_desc board_usb_detect[5];
 +
-+static void board_usbgpio_init(void)
++static int board_usbgpio_init(void)
 +{
 +
 +        int node;
@@ -557,6 +591,61 @@ index 0000000000..8a741a5212
 +    board_usbgpio_init();
 +    setup_dsi();
 +    return 0;
++}
+diff --git a/board/mediatek/lec_mtk_i1200/mt8195_evk_edp_panel.c b/board/mediatek/lec_mtk_i1200/mt8195_evk_edp_panel.c
+new file mode 100644
+index 0000000000..854aee72d6
+--- /dev/null
++++ b/board/mediatek/lec_mtk_i1200/mt8195_evk_edp_panel.c
+@@ -0,0 +1,49 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * MediaTek innolux_hk173vb_01b edp driver
++ *
++ * Copyright (c) 2023 MediaTek Inc.
++ * Author: Tommy Chen <tommyyl.chen@mediatek.com>
++ */
++
++#include <linux/delay.h>
++#include <linux/io.h>
++#include <asm/gpio.h>
++#include "mtk_edp_panel.h"
++
++void edp_panel_get_desc(struct edp_panel_description **edp_panel_desc);
++
++struct display_mode innolux_hk173vb_01b = {
++	.clock = 533280,
++};
++
++static void innolux_hk173vb_01b_power_on(void)
++{
++	struct edp_panel_description *edp_panel_desc = NULL;
++
++	edp_panel_get_desc(&edp_panel_desc);
++
++	if (dm_gpio_is_valid(&edp_panel_desc->vcc_gpio) &&
++	    dm_gpio_is_valid(&edp_panel_desc->bl_en_gpio) &&
++	    dm_gpio_is_valid(&edp_panel_desc->bl_vcc_gpio) &&
++	    dm_gpio_is_valid(&edp_panel_desc->pwm_gpio)) {
++		dm_gpio_set_value(&edp_panel_desc->vcc_gpio, 1);
++		dm_gpio_set_value(&edp_panel_desc->bl_en_gpio, 1);
++		dm_gpio_set_value(&edp_panel_desc->bl_vcc_gpio, 1);
++		dm_gpio_set_value(&edp_panel_desc->pwm_gpio, 1);
++	} else {
++		printf("Warning: %s some gpios invalid. could not power on panel\n", __func__);
++	}
++}
++
++struct edp_panel_description innolux_hk173vb_01b_desc = {
++	.name = "innolux_hk173vb_01b",
++	.compatible = "innolux,hk173vb-01b",
++	.mode = &innolux_hk173vb_01b,
++	.power_on = innolux_hk173vb_01b_power_on,
++};
++
++void edp_panel_get_desc(struct edp_panel_description **edp_panel_desc)
++{
++	*edp_panel_desc = &innolux_hk173vb_01b_desc;
 +}
 diff --git a/board/mediatek/lec_mtk_i1200/mt8195_evk_panel.c b/board/mediatek/lec_mtk_i1200/mt8195_evk_panel.c
 new file mode 100755
@@ -811,9 +900,33 @@ index 0000000000..cbd6bd2c82
 +{
 +	*panel_desc = &startek_kd070fhfid078_desc;
 +}
+diff --git a/include/config_distro_bootcmd.h b/include/config_distro_bootcmd.h
+index 95d5997fb8..78c1d2735d 100644
+--- a/include/config_distro_bootcmd.h
++++ b/include/config_distro_bootcmd.h
+@@ -421,7 +421,7 @@
+ #define BOOTENV_DEV_NAME(devtypeu, devtypel, instance, ...) \
+ 	BOOTENV_DEV_NAME_##devtypeu(devtypeu, devtypel, instance, ## __VA_ARGS__)
+ #define BOOTENV_BOOT_TARGETS \
+-	"boot_targets=" BOOT_TARGET_DEVICES(BOOTENV_DEV_NAME) "\0"
++	"boot_targets=embedded\0"
+ 
+ #define BOOTENV_DEV(devtypeu, devtypel, instance, ...) \
+ 	BOOTENV_DEV_##devtypeu(devtypeu, devtypel, instance, ## __VA_ARGS__)
+@@ -495,6 +495,10 @@
+ 		"done; "                                                  \
+ 		"setenv devplist\0"					  \
+ 	\
++	"interfacetest=usb reset; echo ;usb tree;echo ;net list;echo ;"     \
++	"i2c bus; echo ;gpio status -a;echo ;setenv ipaddr 192.168.1.111 ;" \
++	"setenv serverip 192.168.1.1; ping $serverip\0"        		    \
++	\
+ 	BOOT_TARGET_DEVICES(BOOTENV_DEV)                                  \
+ 	"bootcmd_embedded=bootembedded\0"                                 \
+ 	\
 diff --git a/include/configs/lec_mtk_i1200.h b/include/configs/lec_mtk_i1200.h
 new file mode 100755
-index 0000000000..64f7a19364
+index 0000000000..b45f96115b
 --- /dev/null
 +++ b/include/configs/lec_mtk_i1200.h
 @@ -0,0 +1,126 @@
@@ -931,9 +1044,9 @@ index 0000000000..64f7a19364
 +	"bootargs=net.ifnames=0\0" \
 +	"fdtfile=" CONFIG_DEFAULT_DEVICE_TREE ".dtb\0" \
 +	"splashimage=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0" \
-+	"splashsource=scsi_fs\0" \
++	"splashsource=sf\0" \
 +	"splashfile=logo.bmp\0" \
-+	"splashdevpart=2#bootassets\0" \
++	"splashdevpart=sf\0" \
 +	"splashpos=m,m\0" \
 +	BOOTENV
 +#endif
@@ -944,5 +1057,5 @@ index 0000000000..64f7a19364
 +
 +#endif
 -- 
-2.45.2
+2.25.1
 
