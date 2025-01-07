@@ -21,11 +21,11 @@ You can follow the same steps to build your own customized BSP based on your int
 
 # 3. Adlink Supported Patches
 
-- Patches for the MTK-based products for the Adlink dev kit will be found [here](https://github.com/ADLINK/meta-adlink-mtk/tree/rity-kirkstone-v23.2/recipes-kernel/linux/linux-mtk).
+- Patches for the MTK-based products for the Adlink dev kit will be found [here](https://github.com/ADLINK/meta-adlink-mtk/tree/rity-kirkstone-v24.1/recipes-kernel/linux/linux-mtk).
 - The patches that we created and have are based on the MTK Kernel.
 - This patch is based on kernel 5.15.x version.
 
 # 4. Software Documentation
 
-Refer to the [ipi-wiki](https://www.ipi.wiki/pages/1200-docs?page=HowToBuildYocto.html) page for instructions on building the Yocto as well as flashing the image.
+Refer to the [wiki](https://github.com/ADLINK/meta-adlink-mtk/wiki/Building-Yocto-for-LEC%E2%80%90MTKI1200) page for instructions on building the Yocto .
 
