@@ -16,7 +16,7 @@ index faf6a3bb47..6d2108ebcc 100755
                  .storage = SPLASH_STORAGE_SF,
                  .flags = SPLASH_STORAGE_RAW,
 -                .offset = 0x1580000,
-+                .offset = 0x584000,
++                .offset =0x5c0000,
          },
  };
  
