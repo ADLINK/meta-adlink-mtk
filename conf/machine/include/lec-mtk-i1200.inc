@@ -15,6 +15,7 @@ EXTRA_KERNEL_PATCHES = " \
         file://0006-Added-TPM2.0-Support.patch \
         file://0007-Added-PCIe-compliance-test-support.patch \
         file://0008-Added-support-imx219-camera.patch \
+	file://0009-Added-TLV320AIC3C-and-w8960-codec-support.patch
 "
 
 EXTRA_KERNEL_DTS = " \

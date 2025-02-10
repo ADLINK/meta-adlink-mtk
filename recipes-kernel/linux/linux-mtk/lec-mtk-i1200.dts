@@ -1387,8 +1387,8 @@
 	model = "mt8195_demo";
 	pinctrl-names = "default";
 	pinctrl-0 = <&aud_pins_default>;
+	mediatek,platform = <&afe>;
 	status = "okay";
-
 	dai-link-0 {
 		sound-dai = <&afe>;
 		dai-link-name = "ETDM3_OUT_BE";
@@ -1397,7 +1397,6 @@
 			sound-dai = <&hdmi0>;
 		};
 	};
-
 	dai-link-1 {
 		sound-dai = <&afe>;
 		dai-link-name = "ETDM1_OUT_BE";
@@ -1405,7 +1404,6 @@
 			sound-dai = <&tlv320aic310x>;
 		};
 	};
-
 };
 
 &mfg0 {
