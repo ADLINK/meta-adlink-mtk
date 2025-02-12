@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI:append = " ${KERNEL_SRC_PATCHES}"
 
-LINUX_VERSION_EXTENSION = "-lec-mtki1200-23.2"
+LINUX_VERSION_EXTENSION = "-lec-mtki1200-24.1"
 
 do_copy_source () {
   configs=$(echo "${KERNEL_CONFIG_AARCH64}" | xargs)
