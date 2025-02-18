@@ -629,7 +629,7 @@
 		};
 
 		snor: snor@1132c000 {
-			compatible = "mediatek,mtk-snor";
+			compatible = "mediatek,mt8195-nor";
 			reg = <0 0x1132c000 0 0x1000>;
 			interrupts = <GIC_SPI 825 IRQ_TYPE_LEVEL_HIGH 0>;
 			clocks = <&topckgen CLK_TOP_SPINOR>,
