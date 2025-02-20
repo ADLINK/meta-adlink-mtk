@@ -51,6 +51,7 @@ EXTRA_KERNEL_PATCHES = " \
 		file://absolute-vision_mtk510_defconfig \
         file://0001-Add-absolute-vision-support.patch \
         file://0002-Add-TPM-I2C-driver.patch \
+        file://0003-Add-RTL8211F-LED-config.patch \
 "
 EXTRA_KERNEL_DTS = " \
         file://absolute-vision.dts \
