@@ -26,15 +26,16 @@ Usage: `basename $0` [OPTIONS]
 
 Create build environment
 e.g.
-	source setup_adlink_env.sh -b build_mtk -d /home/adlink/share/downloads -s /home/adlink/share/sstate-cache
+	source setup_adlink_env.sh -m lec-mtk-i1200-ufs -b build_mtk -d /home/adlink/share/downloads -s /home/adlink/share/sstate-cache
 
+ -m <MACHINE>		machine
  -b <BUILD_NAME>	build folder name
  -d <DOWNLOADS>		pre-downloads folder
  -s <SSTATE>		pre-sstate folder
  -h                     Show help
 EOF
 }
-while getopts "b:d:s:" o; do
+while getopts "b:d:m:s:" o; do
     case "${o}" in
     b)
 	BUILD_DIR=${OPTARG}
@@ -42,6 +43,9 @@ while getopts "b:d:s:" o; do
     d)
         DL_DIR=$(realpath "$OPTARG")
         export DL_DIR=$DL_DIR
+        ;;
+    m)
+        export MACHINE=${OPTARG}
         ;;
     s)
         SSTATE_DIR=$(realpath "$OPTARG")
@@ -56,8 +60,7 @@ done
 export TEMPLATECONF=${PWD}/src/meta-adlink-mtk/conf/
 source src/poky/oe-init-build-env $BUILD_DIR
 export BUILD_DIR=`pwd`
-export DISTRO=rity-demo
-export MACHINE=lec-mtk-i1200-ufs
+#export DISTRO=rity-demo
 export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS DL_DIR SSTATE_DIR"
-grep "NDA" ${BUILD_DIR}/conf/local.conf > /dev/null 2>&1 || echo NDA_BUILD = \"1\" >> ${BUILD_DIR}/conf/local.conf 
+#grep "NDA" ${BUILD_DIR}/conf/local.conf > /dev/null 2>&1 || echo NDA_BUILD = \"1\" >> ${BUILD_DIR}/conf/local.conf 
 

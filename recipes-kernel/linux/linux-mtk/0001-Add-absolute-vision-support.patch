@@ -1,0 +1,28 @@
+From a3b49e42d4701a29c2f7fad9c9227a80d8045d00 Mon Sep 17 00:00:00 2001
+From: Tim Liang <tim.liang@adlinktech.com>
+Date: Thu, 14 Nov 2024 11:41:19 +0800
+Subject: [PATCH] Add AbsoluteVision support
+
+---
+ arch/arm64/Kconfig.platforms | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/Kconfig.platforms b/arch/arm64/Kconfig.platforms
+index d7772a4c34fe..0494334925f6 100644
+--- a/arch/arm64/Kconfig.platforms
++++ b/arch/arm64/Kconfig.platforms
+@@ -164,6 +164,11 @@ config ARCH_MEDIATEK
+ 	  This enables support for MediaTek MT27xx, MT65xx, MT76xx
+ 	  & MT81xx ARMv8 SoCs
+ 
++config ARCH_ADLINKTECH
++       bool "Support ADLINKTECH board"
++       help
++         This enables support for ADLINKTECH boards
++
+ config ARCH_MESON
+ 	bool "Amlogic Platforms"
+ 	select COMMON_CLK
+-- 
+2.17.1
+

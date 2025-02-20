@@ -17,8 +17,12 @@
 # You need to select a specific machine to target the build with. There are a selection
 # of emulated machines available which can boot and run in the QEMU emulator:
 #
+#MACHINE ??= "genio-1200-evk"
+#MACHINE ??= "genio-350-evk"
+#MACHINE ??= "genio-510-evk"
+MACHINE ??= "genio-700-evk"
 #MACHINE ??= "i300a-coral"
-MACHINE ??= "i300a-pumpkin"
+#MACHINE ??= "i300a-pumpkin"
 #MACHINE ??= "i300a-sb30"
 #MACHINE ??= "i300b-pumpkin"
 #MACHINE ??= "i350-evk"
@@ -26,6 +30,7 @@ MACHINE ??= "i300a-pumpkin"
 #MACHINE ??= "i350-sb35"
 #MACHINE ??= "i500-evb"
 #MACHINE ??= "i500-pumpkin"
+#MACHINE ??= "i1200-demo"
 
 #
 # Where to place downloads
@@ -237,6 +242,15 @@ PACKAGECONFIG:append:pn-qemu-system-native = " sdl"
 #PACKAGECONFIG:append:pn-qemu-system-native = " gtk+"
 
 #
+# security
+#
+# If security is not enabled as a distro feature, the warning is printed at parse time.
+# If you do not need the 'security' enabled in DISTRO_FEATURES, the warning message can
+# be disabled by setting the following:
+#
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+
+#
 # Hash Equivalence
 #
 # Enable support for automatically running a local hash equivalence server and
@@ -315,7 +329,8 @@ IMAGE_ROOTFS_EXTRA_SPACE = "200000"
 #KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD:i300a-pumpkin += "camera-ov5645.dtbo"
 #KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD:i300a-sb30 += "panel-raspberrypi.dtbo"
 #KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD:i300a-coral += "camera-ov5645.dtbo"
-KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD += "gpu-mali.dtbo video.dtbo"
+KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD:genio-350 += "gpu-mali.dtbo video.dtbo"
+KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD:genio-700 += "gpu-mali.dtbo video.dtbo apusys.dtbo"
+KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD:genio-510 += "gpu-mali.dtbo video.dtbo apusys.dtbo"
+KERNEL_DEVICETREE_OVERLAYS_AUTOLOAD:genio-1200 += "gpu-mali.dtbo video.dtbo apusys.dtbo"
 
-# Uncomment the below line to build the image with the MediaTek NDA Yocto recipes.
-#NDA_BUILD = "1"
