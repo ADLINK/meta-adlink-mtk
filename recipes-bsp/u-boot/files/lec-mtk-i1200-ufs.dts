@@ -265,7 +265,9 @@
 		};
 
 		pins-cs {
-			pinmux = <PINMUX_GPIO140__FUNC_SPINOR_CS>;
+			pinmux = <PINMUX_GPIO140__FUNC_SPINOR_CS>,
+				<PINMUX_GPIO130__FUNC_SPINOR_IO2>,
+				<PINMUX_GPIO131__FUNC_SPINOR_IO3>;
 			drive-strength = <6>;
 			bias-pull-up;
 		};
