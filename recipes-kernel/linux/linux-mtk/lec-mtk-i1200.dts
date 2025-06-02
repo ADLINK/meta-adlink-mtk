@@ -678,11 +678,11 @@
 	status = "okay";
 };
 
-&xhci1 { //WIFI&BT
+&xhci1 { 
 	vusb33-supply = <&mt6359_vusb_ldo_reg>;
-	mediatek,phy-regs = <0x11e30000>; // for compliance test mode
-	mediatek,u3p-dis-msk = <1>;
-	status = "disabled";
+	/*mediatek,phy-regs = <0x11e30000>; */ // for compliance test mode
+	/*mediatek,u3p-dis-msk = <1>;*/
+	status = "okay";
 };
 
 &xhci2 {
