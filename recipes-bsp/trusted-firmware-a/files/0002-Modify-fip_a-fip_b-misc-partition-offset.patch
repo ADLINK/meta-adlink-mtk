@@ -1,0 +1,39 @@
+From 1886711f393dc7f741925c37aca28a30babc7fa2 Mon Sep 17 00:00:00 2001
+From: "dinesh.v" <dinesh.v@adlinktech.com>
+Date: Fri, 29 Nov 2024 16:49:11 +0530
+Subject: [PATCH] Modify fip_a/fip_b/misc partition offset
+
+---
+ plat/mediatek/common/mtk_ab.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/plat/mediatek/common/mtk_ab.h b/plat/mediatek/common/mtk_ab.h
+index f65094218..90bc0b3d8 100644
+--- a/plat/mediatek/common/mtk_ab.h
++++ b/plat/mediatek/common/mtk_ab.h
+@@ -21,16 +21,18 @@
+ #define BOOTCTRL_MAX_RETRY		9
+ #define BOOTCTRL_GET			0
+ #define BOOTCTRL_SET			1
+-#define BOOTCTRL_PART_NOR		0x1480000
++//#define BOOTCTRL_PART_NOR		0x1480000
++#define BOOTCTRL_PART_NOR		0x580000
++
+ #define BOOTCTRL_NOR_BLK		0x1000
+ 
+ #define PART_BOOT_A				0
+ #define PART_BOOT_B				1
+ #define PART_SUFFIX_A			"bootloaders"
+ #define PART_SUFFIX_B			"bootloaders_b"
+-#define PART_BOOT_A_NOR			0x400000
+-#define PART_BOOT_B_NOR			0x800000
+-#define PART_BOOT_SIZE			0x400000
++#define PART_BOOT_A_NOR			0x80000
++#define PART_BOOT_B_NOR			0x280000
++#define PART_BOOT_SIZE			0x200000
+ 
+ struct mtk_bl_ctrl {
+ 	uint32_t slot_suffix;
+-- 
+2.46.0
+

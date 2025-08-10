@@ -1,0 +1,25 @@
+From b4da2f74f4e4010d91c1e6820218217f2adacc4f Mon Sep 17 00:00:00 2001
+From: "deepak.s" <deepak.s@adlinktech.com>
+Date: Sat, 19 Oct 2024 14:21:19 +0530
+Subject: [PATCH 2/2] Enable Clock for Adlink configuration
+
+---
+ drivers/clk/mediatek/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefile
+index 512b38c06e..eeb79b3ff2 100644
+--- a/drivers/clk/mediatek/Makefile
++++ b/drivers/clk/mediatek/Makefile
+@@ -8,7 +8,7 @@ obj-$(CONFIG_TARGET_MT7623) += clk-mt7623.o
+ obj-$(CONFIG_TARGET_MT7622) += clk-mt7622.o
+ obj-$(CONFIG_TARGET_MT7629) += clk-mt7629.o
+ obj-$(CONFIG_TARGET_MT8183) += clk-mt8183.o
+-obj-$(CONFIG_TARGET_MT8195) += clk-mt8195.o clk-mt8195-apmixedsys.o \
++obj-$(CONFIG_TARGET_LEC_MTK_I1200) += clk-mt8195.o clk-mt8195-apmixedsys.o \
+ 			       clk-mt8195-topckgen.o clk-mt8195-infra_ao.o \
+ 			       clk-mt8195-imp_iic_wrap.o clk-mt8195-peri_ao.o \
+ 			       clk-mt8195-vpp0.o clk-mt8195-vpp1.o \
+-- 
+2.46.0
+

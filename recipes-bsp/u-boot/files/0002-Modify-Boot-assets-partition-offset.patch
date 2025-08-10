@@ -1,0 +1,25 @@
+From c3215be2e9562df4298f5f746c9153db1cc11b1c Mon Sep 17 00:00:00 2001
+From: aravindlal <aravindlal.mh@adlinktech.com>
+Date: Sat, 9 Aug 2025 18:51:50 +0530
+Subject: [PATCH] Modify Boot assets partition offset
+
+---
+ board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c b/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
+index faf6a3bb47..5e0e6821cf 100755
+--- a/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
++++ b/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
+@@ -165,7 +165,7 @@ static struct splash_location lec_mtk_1200_spi_splash_locations[] = {
+                 .name = "sf",
+                 .storage = SPLASH_STORAGE_SF,
+                 .flags = SPLASH_STORAGE_RAW,
+-                .offset = 0x1580000,
++                .offset = 0x5c0000,
+         },
+ };
+ 
+-- 
+2.49.0
+
