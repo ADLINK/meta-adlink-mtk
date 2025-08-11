@@ -9,6 +9,7 @@ if test "${fastboot_entry}" -eq 1 || test "${force_fastboot}" -eq 1; then
 	run fastboot
 fi
 
+
 setenv bootargs " ${bootargs} root=PARTLABEL=rootfs rootwait"
 setenv kerneladdr 0x4A000000
 setenv ipaddr 192.168.96.1
