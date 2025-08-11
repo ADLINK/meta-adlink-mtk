@@ -15,12 +15,11 @@
 			status = "okay";
 		};
 	};
-
+	
 	fragment@2 {
 		target = <&disp_pwm0>;
 		__overlay__ {
 			status = "okay";
 		};
 	};
-
 };
