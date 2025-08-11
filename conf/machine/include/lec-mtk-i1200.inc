@@ -7,22 +7,21 @@ KERNEL_DEVICETREE = "mediatek/lec-mtk-i1200-ufs.dtb"
 # kernel patches
 EXTRA_KERNEL_PATCHES = " \
         file://adlink_lec_i1200_defconfig \
-        file://0001-Modify-i2c-imx214-to-support-extra-extension.patch \
-        file://0002-Replace-i2c-mbus_code-to-mtk_mbus_code.patch \
-        file://0003-Modify-i2c-imx214-driver-to-support-2-4-lane-mode.patch \
 	file://0004-Added-display-port-over-DP-connector.patch \
-        file://0005-Added-support-for-panel-b101uan01-and-ADLINK-Config.patch \
-        file://0006-Added-TPM2.0-Support.patch \
-        file://0007-Added-PCIe-compliance-test-support.patch \
-        file://0008-Added-support-imx219-camera.patch \
-	file://0009-Added-TLV320AIC3C-and-w8960-codec-support.patch \
-"
+	file://0005-Added-support-for-panel-b101uan01-and-ADLINK-Config.patch \
+	file://0006-Added-TPM2.0-Support.patch \
+	file://0007-Added-PCIe-compliance-test-support.patch \
+	file://0007-Added-support-PCIe-WIFI-BT-Support.patch \
+	file://0011-TLV320-audio-support.patch \
+	file://0011-sound-driver-bind-tlv320.patch \	
+	"
 
 EXTRA_KERNEL_DTS = " \
 	file://lec-mtk-i1200-ufs.dts \
         file://lec-mtk-i1200.dts \
 	file://mt8195.dtsi \
-"
+	"
+
 
 KERNEL_SRC_PATCHES ="\
 	${EXTRA_KERNEL_PATCHES} \
@@ -47,7 +46,6 @@ EXTRA_UBOOT_PATCHES = " \
 	file://boot.script.its \
 	file://0001-Added-Board-support-for-LEC-MTK-i1200.patch \
 	file://0002-Enable-Clock-for-Adlink-configuration.patch \
-	file://0003-Added-interfacetest-environment-variable-to-list.patch \
 	file://0005-Added-DSI-panel-support.patch \
 	file://0006-Eth-power-support.patch \
 "
