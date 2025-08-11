@@ -56,11 +56,12 @@
 		};
 	};
 
+	
 	fragment@5 {
 		target = <&seninf_top>;
 		__overlay__ {
 			seninf_csi_port_0: seninf_csi_port_0 {
-				compatible = "mediatek,seninf";
+				compatible = "mediatek,isp70-seninf";
 				csi-port = "2A";
 				port {
 					seninf_csi_port_0_in: endpoint {
@@ -91,6 +92,7 @@
 		target = <&mtkcam0>;
 		__overlay__ {
 			status = "okay";
-		};
+		};	
 	};
+
 };
