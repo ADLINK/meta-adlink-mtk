@@ -1,28 +1,27 @@
-From 62e35767174ceb933299d3a655d8b98ebdf6aa7d Mon Sep 17 00:00:00 2001
-From: shivaadlink <shivashankar.t@adlinktech.com>
-Date: Tue, 27 Aug 2024 12:41:05 +0530
-Subject: [PATCH] Added support for panel b101uan01 and ADLINK Config
+From 9c7da58d0a1ff00dc0de8b202c89875c1a133481 Mon Sep 17 00:00:00 2001
+From: aravindlal <aravindlal.mh@adlinktech.com>
+Date: Wed, 25 Jun 2025 12:04:32 +0530
+Subject: [PATCH]  Added support for panel b101uan01 and ADLINK Config
 
-Signed-off-by: shivaadlink <shivashankar.t@adlinktech.com>
 ---
- arch/arm64/Kconfig.platforms                  |   5 +
+ arch/arm64/Kconfig.platforms                  |   6 +
  arch/arm64/boot/dts/mediatek/Makefile         |   2 +
- arch/arm64/boot/dts/mediatek/mt8195.dtsi      |   4 +-
+ arch/arm64/boot/dts/mediatek/mt8195.dtsi      |   2 +-
  drivers/gpu/drm/panel/panel-simple.c          |  37 +++++
  drivers/misc/Kconfig                          |   8 +
  drivers/misc/Makefile                         |   1 +
- drivers/misc/eeprom/at24.c                    |  45 +++++-
+ drivers/misc/eeprom/at24.c                    |  46 +++++-
  drivers/misc/sku_pcb_info.c                   | 138 ++++++++++++++++++
- .../ethernet/stmicro/stmmac/stmmac_platform.c |  70 ++++++++-
+ .../ethernet/stmicro/stmmac/stmmac_platform.c |  69 ++++++++-
  drivers/net/phy/dp83867.c                     |  38 +++++
- 10 files changed, 343 insertions(+), 5 deletions(-)
- create mode 100755 drivers/misc/sku_pcb_info.c
+ 10 files changed, 344 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/misc/sku_pcb_info.c
 
 diff --git a/arch/arm64/Kconfig.platforms b/arch/arm64/Kconfig.platforms
-index b0ce18d4cc98..5bea49ef2a3d 100644
+index 6069120199bb..4a557dd4a432 100644
 --- a/arch/arm64/Kconfig.platforms
 +++ b/arch/arm64/Kconfig.platforms
-@@ -164,6 +164,11 @@ config ARCH_MEDIATEK
+@@ -162,6 +162,12 @@ config ARCH_MEDIATEK
  	  This enables support for MediaTek MT27xx, MT65xx, MT76xx
  	  & MT81xx ARMv8 SoCs
  
@@ -31,40 +30,38 @@ index b0ce18d4cc98..5bea49ef2a3d 100644
 +       help
 +         This enables support for Adlinktech boards
 +
++
  config ARCH_MESON
  	bool "Amlogic Platforms"
- 	select COMMON_CLK
+ 	help
 diff --git a/arch/arm64/boot/dts/mediatek/Makefile b/arch/arm64/boot/dts/mediatek/Makefile
-index b72b6d08c493..c80d1f156c21 100644
+index 88f795ad03c3..37989a5369be 100644
 --- a/arch/arm64/boot/dts/mediatek/Makefile
 +++ b/arch/arm64/boot/dts/mediatek/Makefile
-@@ -41,3 +41,5 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8365-pumpkin.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt8365-sb35.dtb
+@@ -60,3 +60,5 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8390-genio-700-evk.dtb
+ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8391-genio-720-evk.dtb
+ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8391-genio-720-evk-ufs.dtb
  dtb-$(CONFIG_ARCH_MEDIATEK) += mt8516-pumpkin.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += genio-510-evk.dtb
 +dtb-$(CONFIG_ARCH_ADLINKTECH) += lec-mtk-i1200.dtb
 +dtb-$(CONFIG_ARCH_ADLINKTECH) += lec-mtk-i1200-ufs.dtb
 diff --git a/arch/arm64/boot/dts/mediatek/mt8195.dtsi b/arch/arm64/boot/dts/mediatek/mt8195.dtsi
-index 74249f785ed6..d999d5f19de7 100644
+index a080efcdc14b..69437d50db27 100644
 --- a/arch/arm64/boot/dts/mediatek/mt8195.dtsi
 +++ b/arch/arm64/boot/dts/mediatek/mt8195.dtsi
-@@ -281,9 +281,9 @@ l3_0: l3-cache {
+@@ -3970,7 +3970,7 @@ dp_tx: dp-tx@1c600000 {
  	thermal_zones: thermal-zones {
- 		soc_max {
- 			polling-delay = <1000>; /* milliseconds */
--			polling-delay-passive = <100>; /* milliseconds */
-+			polling-delay-passive = <1000>; /* milliseconds */
- 			thermal-sensors = <&lvts 0>;
--			sustainable-power = <5000>;
-+			sustainable-power = <1500>;
+ 		cpu0-thermal {
+ 			polling-delay = <1000>;
+-			polling-delay-passive = <250>;
++			polling-delay-passive = <1000>;
+ 			thermal-sensors = <&lvts_mcu MT8195_MCU_LITTLE_CPU0>;
  
  			trips {
- 				threshold: trip-point {
 diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
-index c5824aa32f03..cd85e1997798 100644
+index 11ade6bac592..8758ae4b7197 100644
 --- a/drivers/gpu/drm/panel/panel-simple.c
 +++ b/drivers/gpu/drm/panel/panel-simple.c
-@@ -3951,6 +3951,38 @@ struct panel_desc_dsi {
+@@ -4578,6 +4578,38 @@ struct panel_desc_dsi {
  	unsigned int lanes;
  };
  
@@ -103,7 +100,7 @@ index c5824aa32f03..cd85e1997798 100644
  static const struct drm_display_mode auo_b080uan01_mode = {
  	.clock = 154500,
  	.hdisplay = 1200,
-@@ -4155,6 +4187,11 @@ static const struct panel_desc_dsi osd101t2045_53ts = {
+@@ -4782,6 +4814,11 @@ static const struct panel_desc_dsi osd101t2045_53ts = {
  
  static const struct of_device_id dsi_of_match[] = {
  	{
@@ -116,10 +113,10 @@ index c5824aa32f03..cd85e1997798 100644
  		.data = &auo_b080uan01
  	}, {
 diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
-index 0f5a49fc7c9e..b14029b28849 100644
+index cadd4a820c03..fb83e95b8559 100644
 --- a/drivers/misc/Kconfig
 +++ b/drivers/misc/Kconfig
-@@ -470,6 +470,14 @@ config HISI_HIKEY_USB
+@@ -493,6 +493,14 @@ config HISI_HIKEY_USB
  	  switching between the dual-role USB-C port and the USB-A host ports
  	  using only one USB controller.
  
@@ -131,20 +128,23 @@ index 0f5a49fc7c9e..b14029b28849 100644
 +	  This is not linked to any specific hardware category and is a general driver.
 +
 +
- source "drivers/misc/c2port/Kconfig"
- source "drivers/misc/eeprom/Kconfig"
- source "drivers/misc/cb710/Kconfig"
+ config OPEN_DICE
+ 	tristate "Open Profile for DICE driver"
+ 	depends on OF_RESERVED_MEM
 diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
-index a086197af544..2aa65a5842da 100644
+index f2a4d1ff65d4..87283b02fc1d 100644
 --- a/drivers/misc/Makefile
 +++ b/drivers/misc/Makefile
-@@ -59,3 +59,4 @@ obj-$(CONFIG_UACCE)		+= uacce/
+@@ -60,6 +60,7 @@ obj-$(CONFIG_UACCE)		+= uacce/
  obj-$(CONFIG_XILINX_SDFEC)	+= xilinx_sdfec.o
  obj-$(CONFIG_HISI_HIKEY_USB)	+= hisi_hikey_usb.o
  obj-$(CONFIG_HI6421V600_IRQ)	+= hi6421v600-irq.o
 +obj-$(CONFIG_ADLINK_SKU_PCB_INFO) += sku_pcb_info.o
+ obj-$(CONFIG_OPEN_DICE)		+= open-dice.o
+ obj-$(CONFIG_GP_PCI1XXXX)	+= mchp_pci1xxxx/
+ obj-$(CONFIG_VCPU_STALL_DETECTOR)	+= vcpu_stall_detector.o
 diff --git a/drivers/misc/eeprom/at24.c b/drivers/misc/eeprom/at24.c
-index 305ffad131a2..08e671dcf126 100644
+index c290e849b2ed..61febcdc8a32 100644
 --- a/drivers/misc/eeprom/at24.c
 +++ b/drivers/misc/eeprom/at24.c
 @@ -40,6 +40,10 @@
@@ -158,18 +158,17 @@ index 305ffad131a2..08e671dcf126 100644
  /*
   * I2C EEPROMs from most vendors are inexpensive and mostly interchangeable.
   * Differences between different vendor product lines (like Atmel AT24C or
-@@ -87,7 +91,9 @@ struct at24_data {
- 	u32 byte_len;
+@@ -83,6 +87,9 @@ struct at24_data {
  	u16 page_size;
  	u8 flags;
--
+ 
 +#ifdef CONFIG_ARCH_ADLINKTECH
 +	bool write_protect;
 +#endif
  	struct nvmem_device *nvmem;
  	struct regulator *vcc_reg;
  	void (*read_post)(unsigned int off, char *buf, size_t count);
-@@ -472,6 +478,13 @@ static int at24_write(void *priv, unsigned int off, void *val, size_t count)
+@@ -470,6 +477,13 @@ static int at24_write(void *priv, unsigned int off, void *val, size_t count)
  	int ret;
  
  	at24 = priv;
@@ -183,7 +182,7 @@ index 305ffad131a2..08e671dcf126 100644
  	dev = at24_base_client_dev(at24);
  
  	if (unlikely(!count))
-@@ -585,6 +598,28 @@ static unsigned int at24_get_offset_adj(u8 flags, unsigned int byte_len)
+@@ -581,6 +595,29 @@ static unsigned int at24_get_offset_adj(u8 flags, unsigned int byte_len)
  	}
  }
  
@@ -209,13 +208,15 @@ index 305ffad131a2..08e671dcf126 100644
 +static DEVICE_ATTR_RW(write_protect);
 +
 +#endif
- static int at24_probe(struct i2c_client *client)
++
+ static void at24_probe_temp_sensor(struct i2c_client *client)
  {
- 	struct regmap_config regmap_config = { };
-@@ -694,6 +729,14 @@ static int at24_probe(struct i2c_client *client)
- 	at24->client[0].client = client;
- 	at24->client[0].regmap = regmap;
- 
+ 	struct at24_data *at24 = i2c_get_clientdata(client);
+@@ -715,7 +752,14 @@ static int at24_probe(struct i2c_client *client)
+ 	at24->num_addresses = num_addresses;
+ 	at24->offset_adj = at24_get_offset_adj(flags, byte_len);
+ 	at24->client_regmaps[0] = regmap;
+-
 +#ifdef CONFIG_ARCH_ADLINKTECH
 +    err = sysfs_create_file(&client->dev.kobj, &dev_attr_write_protect.attr);
 +    if (err) {
@@ -228,8 +229,8 @@ index 305ffad131a2..08e671dcf126 100644
  	if (IS_ERR(at24->vcc_reg))
  		return PTR_ERR(at24->vcc_reg);
 diff --git a/drivers/misc/sku_pcb_info.c b/drivers/misc/sku_pcb_info.c
-new file mode 100755
-index 000000000000..9c7fd11e6b1c
+new file mode 100644
+index 000000000000..8f0ecb0c7e7d
 --- /dev/null
 +++ b/drivers/misc/sku_pcb_info.c
 @@ -0,0 +1,138 @@
@@ -372,7 +373,7 @@ index 000000000000..9c7fd11e6b1c
 +MODULE_DESCRIPTION("A simple Linux driver for the SKU and PCB info.");
 +MODULE_VERSION("1.0");
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index c39214b9934d..e1eec9899b29 100644
+index 30d5e635190e..ebc8daf5ce2f 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
 @@ -20,6 +20,58 @@
@@ -434,11 +435,10 @@ index c39214b9934d..e1eec9899b29 100644
  #ifdef CONFIG_OF
  
  /**
-@@ -405,7 +457,21 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+@@ -409,6 +461,21 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
  	if (!plat)
  		return ERR_PTR(-ENOMEM);
--
+ 
 +#ifdef CONFIG_ARCH_ADLINKTECH
 +    if (read_eeprom_mac_address(&pdev->dev, mac)) {
 +        rc = of_get_mac_address(np, mac);
@@ -453,11 +453,11 @@ index c39214b9934d..e1eec9899b29 100644
 +    } else {
 +        dev_info(&pdev->dev, "Successfully read MAC address from EEPROM: %pM\n", mac);
 +    }
-+#else
++#else	
  	rc = of_get_mac_address(np, mac);
  	if (rc) {
  		if (rc == -EPROBE_DEFER)
-@@ -413,7 +479,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+@@ -416,7 +483,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
  
  		eth_zero_addr(mac);
  	}
@@ -467,22 +467,23 @@ index c39214b9934d..e1eec9899b29 100644
  	if (phy_mode < 0)
  		return ERR_PTR(phy_mode);
 diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
-index 6bbc81ad295f..6ecb9927b66b 100644
+index e397e7d642d9..ca0e763fb078 100644
 --- a/drivers/net/phy/dp83867.c
 +++ b/drivers/net/phy/dp83867.c
-@@ -55,6 +55,11 @@
- 
+@@ -60,6 +60,12 @@
  #define DP83867_SW_RESET	BIT(15)
  #define DP83867_SW_RESTART	BIT(14)
+ 
 +/* Extended LED Registers */
 +#if defined(CONFIG_ARCH_ADLINKTECH)
 +#define DP83867_LEDCR1		0x0018
 +#define DP83867_LEDCR2		0x0019
 +#endif
- 
++
  /* MICR Interrupt bits */
  #define MII_DP83867_MICR_AN_ERR_INT_EN		BIT(15)
-@@ -802,6 +807,39 @@ static int dp83867_config_init(struct phy_device *phydev)
+ #define MII_DP83867_MICR_SPEED_CHNG_INT_EN	BIT(14)
+@@ -912,7 +918,39 @@ static int dp83867_config_init(struct phy_device *phydev)
  
  	if (dp83867->port_mirroring != DP83867_PORT_MIRROING_KEEP)
  		dp83867_config_port_mirroring(phydev);
@@ -505,7 +506,7 @@ index 6bbc81ad295f..6ecb9927b66b 100644
 +		if (ret)
 +			return ret;
 +	}
-+
+ 
 +	/* Control LED outputs' ability - set LED_0, LED_1, LED_2 active low, LED_GPIO reserve */
 +	val = phy_read(phydev, DP83867_LEDCR2);
 +	if (val < 0)
@@ -516,12 +517,12 @@ index 6bbc81ad295f..6ecb9927b66b 100644
 +		val |= 0x0000;
 +		ret = phy_write(phydev, DP83867_LEDCR2, val);
 +		if (ret)
-+			return ret;
++		return ret;
 +	}
 +#endif
- 
  	/* Clock output selection if muxing property is set */
  	if (dp83867->set_clk_output) {
+ 		u16 mask = DP83867_IO_MUX_CFG_CLK_O_DISABLE;
 -- 
-2.45.2
+2.49.0
 

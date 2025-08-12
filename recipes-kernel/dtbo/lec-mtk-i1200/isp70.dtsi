@@ -129,7 +129,7 @@
 		target-path = "/soc";
 		__overlay__ {
 			camisp: camisp@16000000 {
-				compatible = "mediatek,camisp";
+				compatible = "mediatek,isp70-camisp";
 				reg = <0 0x16000000 0 0x1000>;
 				reg-names = "base";
 				mediatek,ccd = <&remoteproc_ccd>;
@@ -137,7 +137,7 @@
 			};
 
 			camisp_l13 {
-				compatible = "mediatek,camisp-larb";
+				compatible = "mediatek,isp70-camisp-larb";
 				mediatek,larb-id = <13>;
 				dma-ranges = <0x2 0x0 0x0 0x0 0x1 0x0>;
 				iommus = <&iommu_vdo M4U_PORT_L13_CAM_CAMSV_CQI_E1>,
@@ -153,7 +153,7 @@
 			};
 
 			camisp_l14 {
-				compatible = "mediatek,camisp-larb";
+				compatible = "mediatek,isp70-camisp-larb";
 				mediatek,larb-id = <14>;
 				dma-ranges = <0x2 0x0 0x0 0x0 0x1 0x0>;
 				iommus = <&iommu_vpp M4U_PORT_L14_CAM_GCAMSV_A_IMGO_1>,
@@ -169,10 +169,10 @@
 					 <&iommu_vpp M4U_PORT_L14_CAM_GCAMSV_B_UFEO_1>,
 					 <&iommu_vpp M4U_PORT_L14_CAM_PDAI_1>,
 					 <&iommu_vpp M4U_PORT_L14_CAM_PDAO>;
-			};
-
+			};			
+			
 			seninf_top: seninf_top@16007000 {
-				compatible = "mediatek,seninf-core";
+				compatible = "mediatek,isp70-seninf-core";
 				reg = <0 0x16007000 0 0x8000>,
 				      <0 0x11E50000 0 0xc000>;
 				reg-names = "base", "ana-rx";
@@ -196,7 +196,7 @@
 			};
 
 			cam_raw_a@16030000 {
-				compatible = "mediatek,cam-raw";
+				compatible = "mediatek,isp70-cam-raw";
 				reg = <0 0x16030000 0 0x8000>,
 					  <0 0x16038000 0 0x8000>;
 				reg-names = "base", "inner_base";
@@ -239,7 +239,7 @@
 			};
 
 			cam_yuv_a@16050000 {
-				compatible = "mediatek,cam-yuv";
+				compatible = "mediatek,isp70-cam-yuv";
 				reg = <0 0x16050000 0 0x8000>;
 				reg-names = "base";
 				mediatek,cam-id = <0>;
@@ -264,7 +264,7 @@
 			};
 
 			cam_raw_b@16070000 {
-				compatible = "mediatek,cam-raw";
+				compatible = "mediatek,isp70-cam-raw";
 				reg = <0 0x16070000 0 0x8000>,
 				      <0 0x16078000 0 0x8000>;
 				reg-names = "base", "inner_base";
@@ -307,7 +307,7 @@
 			};
 
 			cam_yuv_b@16090000 {
-				compatible = "mediatek,cam-yuv";
+				compatible = "mediatek,isp70-cam-yuv";
 				reg = <0 0x16090000 0 0x8000>;
 				reg-names = "base";
 				mediatek,cam-id = <1>;
@@ -332,7 +332,7 @@
 			};
 
 			camsv1@160b0000 {
-				compatible = "mediatek,camsv";
+				compatible = "mediatek,isp70-camsv";
 				reg = <0 0x160b0000 0 0x1000>,
 				      <0 0x160b8000 0 0x1000>;
 				reg-names = "base", "inner_base";
@@ -359,7 +359,7 @@
 			};
 
 			camsv2@160b1000 {
-				compatible = "mediatek,camsv";
+				compatible = "mediatek,isp70-camsv";
 				reg = <0 0x160b1000 0 0x1000>,
 				      <0 0x160b9000 0 0x1000>;
 				reg-names = "base", "inner_base";
@@ -386,7 +386,7 @@
 			};
 
 			camsv3@160b2000 {
-				compatible = "mediatek,camsv";
+				compatible = "mediatek,isp70-camsv";
 				reg = <0 0x160b2000 0 0x1000>,
 				      <0 0x160ba000 0 0x1000>;
 				reg-names = "base", "inner_base";
@@ -413,7 +413,7 @@
 			};
 
 			camsv4@160b3000 {
-				compatible = "mediatek,camsv";
+				compatible = "mediatek,isp70-camsv";
 				reg = <0 0x160b3000 0 0x1000>,
 				      <0 0x160bb000 0 0x1000>;
 				reg-names = "base", "inner_base";
@@ -440,7 +440,7 @@
 			};
 
 			camsv5@160b4000 {
-				compatible = "mediatek,camsv";
+				compatible = "mediatek,isp70-camsv";
 				reg = <0 0x160b4000 0 0x1000>,
 				      <0 0x160bc000 0 0x1000>;
 				reg-names = "base", "inner_base";
@@ -467,7 +467,7 @@
 			};
 
 			camsv6@160b5000 {
-				compatible = "mediatek,camsv";
+				compatible = "mediatek,isp70-camsv";
 				reg = <0 0x160b5000 0 0x1000>,
 				      <0 0x160bd000 0 0x1000>;
 				reg-names = "base", "inner_base";
@@ -499,7 +499,7 @@
 		target-path = "/soc";
 		__overlay__ {
 			imgsys_fw: imgsys_fw@15000000 {
-				compatible = "mediatek,imgsys";
+				compatible = "mediatek,isp70-imgsys";
 				dma-ranges = <0x2 0x0 0x0 0x0 0x1 0x0>;
 				reg = <0 0x15000000 0 0x4000>,	/* 0 IMGSYS_TOP */
 				      <0 0x15020000 0 0x10000>,	/* 1 IMGSYS_TRAW */
@@ -579,7 +579,8 @@
 					 <&gce1 6 CMDQ_THR_PRIO_1>,
 					 <&gce1 7 CMDQ_THR_PRIO_1>,
 					 <&gce1 8 CMDQ_THR_PRIO_1>,
-					 <&gce1 9 CMDQ_THR_PRIO_1>;
+					 <&gce1 9 CMDQ_THR_PRIO_1>,
+					<&gce1 11 CMDQ_THR_PRIO_1>;
 				traw_cq_thread0_frame_done =
 					/bits/ 16 <CMDQ_EVENT_CQ_THR_DONE_TRAW0_0>;
 				traw_cq_thread1_frame_done =
@@ -967,7 +968,7 @@
 			};
 
 			hcp: hcp@0 {
-				compatible = "mediatek,hcp";
+				compatible = "mediatek,isp70-hcp";
 				dma-ranges = <0x2 0x0 0x0 0x0 0x1 0x0>;
 				iommus = <&iommu_vdo M4U_PORT_L9_IMG_IMGI_T1_A>,
 					 <&iommu_vdo M4U_PORT_L9_IMG_IMGBI_T1_A>,
@@ -1026,7 +1027,7 @@
 			};
 
 			imgsys_larb {
-				compatible = "mediatek,imgsys-larb";
+				compatible = "mediatek,isp70-imgsys-larb";
 				dma-ranges = <0x2 0x0 0x0 0x0 0x1 0x0>;
 				#mediatek,larb-id = <11>;
 				iommus = <&iommu_vdo M4U_PORT_L11_IMG_WPE_EIS_RDMA0_A>,
@@ -1042,7 +1043,7 @@
 			};
 
 			ipesys_me: ipesys_me@15320000 {
-				compatible = "mediatek,ipesys-me";
+				compatible = "mediatek,isp70-ipesys-me";
 				dma-ranges = <0x2 0x0 0x0 0x0 0x1 0x0>;
 				reg = <0 0x15320000 0 0x10000>;	/* 9 IMGSYS_ME */
 				mediatek,larb = <&larb12>;

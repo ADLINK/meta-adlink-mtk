@@ -1,8 +1,9 @@
-From d210c85da2b665681089cddd5ce1ebd1ac75de4a Mon Sep 17 00:00:00 2001
-From: "dinesh.v" <dinesh.v@adlinktech.com>
-Date: Fri, 14 Feb 2025 18:19:15 +0530
+From 3df73a1668f557d096be694fdb6fcd3dd114eccb Mon Sep 17 00:00:00 2001
+From: aravindlal <aravindlal.mh@adlinktech.com>
+Date: Thu, 19 Jun 2025 14:58:58 +0530
 Subject: [PATCH] Added Board support for LEC-MTK-i1200
 
+Signed-off-by: aravindlal <aravindlal.mh@adlinktech.com>
 ---
  arch/arm/mach-mediatek/Kconfig                |   8 +-
  arch/arm/mach-mediatek/Makefile               |   1 +
@@ -28,10 +29,10 @@ Subject: [PATCH] Added Board support for LEC-MTK-i1200
  create mode 100755 include/configs/lec_mtk_i1200.h
 
 diff --git a/arch/arm/mach-mediatek/Kconfig b/arch/arm/mach-mediatek/Kconfig
-index 72da07527d..3a1c5d3456 100644
+index e76ecfec0e..8e03c1b3c3 100644
 --- a/arch/arm/mach-mediatek/Kconfig
 +++ b/arch/arm/mach-mediatek/Kconfig
-@@ -67,6 +67,10 @@ config TARGET_MT8195
+@@ -68,6 +68,10 @@ config TARGET_MT8195
  	  SD and MMC cards, UFS, PWM, I2C, I2S, S/PDIF, and several LPDDR3
  	  and LPDDR4 options.
  
@@ -42,33 +43,33 @@ index 72da07527d..3a1c5d3456 100644
  
  config TARGET_MT8365
  	bool "MediaTek MT8365 SoC"
-@@ -123,6 +127,7 @@ config SYS_BOARD
+@@ -134,6 +138,7 @@ config SYS_BOARD
  	default "mt8183" if TARGET_MT8183
  	default "mt8188" if TARGET_MT8188
  	default "mt8195" if TARGET_MT8195
 +	default "lec_mtk_i1200" if TARGET_LEC_MTK_I1200
  	default "mt8365" if TARGET_MT8365
  	default "mt8370" if TARGET_MT8370
- 	default "mt8512" if TARGET_MT8512
-@@ -142,6 +147,7 @@ config SYS_CONFIG_NAME
+ 	default "mt8391" if TARGET_MT8391
+@@ -154,6 +159,7 @@ config SYS_CONFIG_NAME
  	default "mt8183" if TARGET_MT8183
  	default "mt8188" if TARGET_MT8188
  	default "mt8195" if TARGET_MT8195
 +	default "lec_mtk_i1200" if TARGET_LEC_MTK_I1200
  	default "mt8365" if TARGET_MT8365
  	default "mt8370" if TARGET_MT8370
- 	default "mt8512" if TARGET_MT8512
-@@ -157,7 +163,7 @@ config MTK_BROM_HEADER_INFO
+ 	default "mt8391" if TARGET_MT8391
+@@ -170,7 +176,7 @@ config MTK_BROM_HEADER_INFO
  	string
  	default "media=nor" if TARGET_MT8518 || TARGET_MT8512 || TARGET_MT7629 || TARGET_MT7622
  	default "media=emmc" if TARGET_MT8516 || TARGET_MT8365 || TARGET_MT8183 || TARGET_MT8195 \
--		|| TARGET_MT8188 || TARGET_MT8370
-+		|| TARGET_MT8188 || TARGET_MT8370 || TARGET_LEC_MTK_I1200
+-		|| TARGET_MT8188 || TARGET_MT8370 || TARGET_MT8391
++		|| TARGET_MT8188 || TARGET_MT8370 || TARGET_MT8391 || TARGET_LEC_MTK_I1200
  	default "lk=1" if TARGET_MT7623
  
  config SERIAL_ANDROID
 diff --git a/arch/arm/mach-mediatek/Makefile b/arch/arm/mach-mediatek/Makefile
-index 27f79fcbb7..6f037c636e 100644
+index ae1187163c..986fc117ac 100644
 --- a/arch/arm/mach-mediatek/Makefile
 +++ b/arch/arm/mach-mediatek/Makefile
 @@ -10,6 +10,7 @@ obj-$(CONFIG_TARGET_MT7629) += mt7629/
@@ -78,7 +79,7 @@ index 27f79fcbb7..6f037c636e 100644
 +obj-$(CONFIG_TARGET_LEC_MTK_I1200) += lec_mtk_i1200/
  obj-$(CONFIG_TARGET_MT8365) += mt8365/
  obj-$(CONFIG_TARGET_MT8370) += mt8370/
- obj-$(CONFIG_TARGET_MT8516) += mt8516/
+ obj-$(CONFIG_TARGET_MT8391) += mt8391/
 diff --git a/arch/arm/mach-mediatek/lec_mtk_i1200/Kconfig b/arch/arm/mach-mediatek/lec_mtk_i1200/Kconfig
 new file mode 100755
 index 0000000000..a34fa2cf2e
@@ -926,7 +927,7 @@ index 95d5997fb8..78c1d2735d 100644
  	\
 diff --git a/include/configs/lec_mtk_i1200.h b/include/configs/lec_mtk_i1200.h
 new file mode 100755
-index 0000000000..cadd1051f7
+index 0000000000..64f7a19364
 --- /dev/null
 +++ b/include/configs/lec_mtk_i1200.h
 @@ -0,0 +1,126 @@
@@ -1057,5 +1058,5 @@ index 0000000000..cadd1051f7
 +
 +#endif
 -- 
-2.47.1
+2.49.0
 

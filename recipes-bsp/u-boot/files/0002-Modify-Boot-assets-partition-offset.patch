@@ -1,15 +1,14 @@
-From 26d7104fa47d121340870e2fbd7215b1903ad49f Mon Sep 17 00:00:00 2001
-From: "deepak.s" <deepak.s@adlinktech.com>
-Date: Tue, 25 Feb 2025 12:30:21 +0530
+From c3215be2e9562df4298f5f746c9153db1cc11b1c Mon Sep 17 00:00:00 2001
+From: aravindlal <aravindlal.mh@adlinktech.com>
+Date: Sat, 9 Aug 2025 18:51:50 +0530
 Subject: [PATCH] Modify Boot assets partition offset
 
 ---
  board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c | 2 +-
- include/configs/lec_mtk_i1200.h              | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c b/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
-index faf6a3bb47..d4c52eceb9 100755
+index faf6a3bb47..5e0e6821cf 100755
 --- a/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
 +++ b/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
 @@ -165,7 +165,7 @@ static struct splash_location lec_mtk_1200_spi_splash_locations[] = {
@@ -17,23 +16,10 @@ index faf6a3bb47..d4c52eceb9 100755
                  .storage = SPLASH_STORAGE_SF,
                  .flags = SPLASH_STORAGE_RAW,
 -                .offset = 0x1580000,
-+                .offset =0x5c0000,
++                .offset = 0x5c0000,
          },
  };
  
-diff --git a/include/configs/lec_mtk_i1200.h b/include/configs/lec_mtk_i1200.h
-index 64f7a19364..8c6177e883 100755
---- a/include/configs/lec_mtk_i1200.h
-+++ b/include/configs/lec_mtk_i1200.h
-@@ -112,7 +112,7 @@
- 	"bootargs=net.ifnames=0\0" \
- 	"fdtfile=" CONFIG_DEFAULT_DEVICE_TREE ".dtb\0" \
- 	"splashimage=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0" \
--	"splashsource=scsi_fs\0" \
-+	"splashsource=sf\0" \
- 	"splashfile=logo.bmp\0" \
- 	"splashdevpart=2#bootassets\0" \
- 	"splashpos=m,m\0" \
 -- 
-2.47.1
+2.49.0
 
