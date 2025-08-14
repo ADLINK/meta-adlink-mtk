@@ -1,0 +1,135 @@
+From 9dcce14fed6141493a92c28174735bdcb8d23cd6 Mon Sep 17 00:00:00 2001
+From: aravindlal <aravindlal.mh@adlinktech.com>
+Date: Mon, 30 Jun 2025 23:19:59 +0530
+Subject: [PATCH]  Added PCIe compliance test support
+
+---
+ drivers/pci/controller/pcie-mediatek-gen3.c | 48 +++++++++++++++++++--
+ 1 file changed, 45 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/pci/controller/pcie-mediatek-gen3.c b/drivers/pci/controller/pcie-mediatek-gen3.c
+index 6bb200d9608f..a8da37f0065b 100644
+--- a/drivers/pci/controller/pcie-mediatek-gen3.c
++++ b/drivers/pci/controller/pcie-mediatek-gen3.c
+@@ -22,6 +22,13 @@
+ #include <linux/pm_domain.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/reset.h>
++#include <linux/reset.h>
++
++#ifdef CONFIG_ARCH_ADLINKTECH
++#include <linux/of_platform.h>
++#include <linux/of_gpio.h>
++#include <linux/gpio.h>
++#endif
+ 
+ #include "../pci.h"
+ 
+@@ -156,6 +163,7 @@ struct mtk_gen3_pcie {
+ 	struct phy *phy;
+ 	struct clk_bulk_data *clks;
+ 	int num_clks;
++	int compliance_test_enable;
+ 	struct mtk_pcie_data *data;
+ 
+ 	int irq;
+@@ -388,16 +396,23 @@ static int mtk_pcie_startup_port(struct mtk_gen3_pcie *pcie)
+ 	val |= PCIE_MAC_RSTB | PCIE_PHY_RSTB | PCIE_BRG_RSTB | PCIE_PE_RSTB;
+ 	writel_relaxed(val, pcie->base + PCIE_RST_CTRL_REG);
+ 
++	       /* Wait 10ms after PCIE_BRG_RSTB is set */
++        usleep_range(10 * 1000, 15 * 1000);
++ 
++       /* De-assert reset signals */
++        val &= ~(PCIE_MAC_RSTB | PCIE_PHY_RSTB | PCIE_BRG_RSTB);
++        writel_relaxed(val, pcie->base + PCIE_RST_CTRL_REG);
++
+ 	/*
+ 	 * Described in PCIe CEM specification sections 2.2 (PERST# Signal)
+ 	 * and 2.2.1 (Initial Power-Up (G3 to S0)).
+ 	 * The deassertion of PERST# should be delayed 100ms (TPVPERL)
+ 	 * for the power and clock to become stable.
+ 	 */
+-	msleep(100);
++	msleep(90);
+ 
+ 	/* De-assert reset signals */
+-	val &= ~(PCIE_MAC_RSTB | PCIE_PHY_RSTB | PCIE_BRG_RSTB | PCIE_PE_RSTB);
++	val &= ~PCIE_PE_RSTB;
+ 	writel_relaxed(val, pcie->base + PCIE_RST_CTRL_REG);
+ 
+ 	/* Check if the link is up or not */
+@@ -800,6 +815,7 @@ static int mtk_pcie_parse_port(struct mtk_gen3_pcie *pcie)
+ 	struct device *dev = pcie->dev;
+ 	struct platform_device *pdev = to_platform_device(dev);
+ 	struct resource *regs;
++	const char *tmp;
+ 	int ret;
+ 
+ 	regs = platform_get_resource_byname(pdev, IORESOURCE_MEM, "pcie-mac");
+@@ -845,7 +861,14 @@ static int mtk_pcie_parse_port(struct mtk_gen3_pcie *pcie)
+ 		dev_err(dev, "failed to get clocks\n");
+ 		return pcie->num_clks;
+ 	}
+-
++	
++	pcie->compliance_test_enable = false;
++        if (!of_property_read_string(dev->of_node, "compliance-test", &tmp) || strstr(boot_command_line, "pcie_compliance_test")) {
++                if (!strcmp(tmp, "enabled") || strstr(boot_command_line, "pcie_compliance_test")) {
++                       pcie->compliance_test_enable = true;
++                       dev_info(dev, "Compliance test mode enabled\n");
++               }
++       } 
+ 	return 0;
+ }
+ 
+@@ -898,6 +921,8 @@ static int mtk_pcie_power_up(struct mtk_gen3_pcie *pcie)
+ 
+ static void mtk_pcie_power_down(struct mtk_gen3_pcie *pcie)
+ {
++	if (pcie->compliance_test_enable == true)
++               return;
+ 	clk_bulk_disable_unprepare(pcie->num_clks, pcie->clks);
+ 
+ 	pm_runtime_put_sync(pcie->dev);
+@@ -942,6 +967,8 @@ static int mtk_pcie_setup(struct mtk_gen3_pcie *pcie)
+ 	return 0;
+ 
+ err_setup:
++	 if (pcie->compliance_test_enable == true)
++               return 0;
+ 	mtk_pcie_power_down(pcie);
+ 
+ 	return err;
+@@ -953,6 +980,11 @@ static int mtk_pcie_probe(struct platform_device *pdev)
+ 	struct mtk_gen3_pcie *pcie;
+ 	struct pci_host_bridge *host;
+ 	int err;
++#ifdef CONFIG_ARCH_ADLINKTECH
++       struct device_node *np = pdev->dev.of_node;
++       int pd_gpio;
++#endif
++
+ 
+ 	host = devm_pci_alloc_host_bridge(dev, sizeof(*pcie));
+ 	if (!host)
+@@ -963,6 +995,16 @@ static int mtk_pcie_probe(struct platform_device *pdev)
+ 	pcie->dev = dev;
+ 	pcie->data = (struct mtk_pcie_data *)of_device_get_match_data(dev);
+ 	platform_set_drvdata(pdev, pcie);
++#ifdef CONFIG_ARCH_ADLINKTECH
++       pd_gpio = of_get_named_gpio(np, "pd-gpios", 0);
++       /* GPIO request and configuration */
++
++        err = devm_gpio_request_one(&pdev->dev, pd_gpio,GPIOF_OUT_INIT_HIGH, "WIFI PD");
++        if (err)
++                printk("%s: [Adlink] Failed to request wifi pd pin\n",__func__);
++        else
++                printk("%s: [Adlink] Success to request wifi pd pin\n", __func__);
++#endif
+ 
+ 	err = mtk_pcie_setup(pcie);
+ 	if (err)
+-- 
+2.49.0
+

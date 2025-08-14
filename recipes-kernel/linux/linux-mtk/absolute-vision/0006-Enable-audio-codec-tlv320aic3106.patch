@@ -1,0 +1,80 @@
+From cdc934e2ecf700900b433b07440902d6bfc690ae Mon Sep 17 00:00:00 2001
+From: "deepak.s" <deepak.s@adlinktech.com>
+Date: Thu, 31 Jul 2025 13:39:48 +0530
+Subject: [PATCH] Enable audio codec tlv320aic3106
+
+---
+ sound/soc/mediatek/mt8188/mt8188-mt6359.c | 26 +++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/sound/soc/mediatek/mt8188/mt8188-mt6359.c b/sound/soc/mediatek/mt8188/mt8188-mt6359.c
+index 6d2e7641e9dd..c288bb9e461b 100644
+--- a/sound/soc/mediatek/mt8188/mt8188-mt6359.c
++++ b/sound/soc/mediatek/mt8188/mt8188-mt6359.c
+@@ -354,6 +354,13 @@ static const struct snd_soc_dapm_route mt8188_mt6359_routes[] = {
+ 	{"I021", NULL, SOF_DMA_DL3},
+ };
+ 
++static struct snd_soc_dai_link_component etdm2_codecs[] = {
++       {
++        .name = "tlv320aic3x-codec",
++        .dai_name = "tlv320aic3x-hifi",
++       },
++};
++
+ static int mt8188_mt6359_mtkaif_calibration(struct snd_soc_pcm_runtime *rtd)
+ {
+ 	struct snd_soc_component *cmpnt_afe =
+@@ -567,16 +574,30 @@ static int mt8188_etdm_hw_params(struct snd_pcm_substream *substream,
+ 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
+ 	struct snd_soc_card *card = rtd->card;
+ 	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(rtd, 0);
++	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
+ 	unsigned int rate = params_rate(params);
+ 	unsigned int mclk_fs_ratio = 128;
+ 	unsigned int mclk_fs = rate * mclk_fs_ratio;
+ 	int ret;
+ 
++    	dev_info(card->dev, "codec_dai->name: %s", codec_dai->name);
++
+ 	ret = snd_soc_dai_set_sysclk(cpu_dai, 0, mclk_fs, SND_SOC_CLOCK_OUT);
+ 	if (ret) {
+ 		dev_err(card->dev, "failed to set sysclk\n");
+ 		return ret;
+ 	}
++	ret = snd_soc_dai_set_sysclk(codec_dai, 0, mclk_fs, SND_SOC_CLOCK_IN);
++	if (ret) {
++	        if (ret == -ENOTSUPP) {
++        		    dev_err(card->dev, "Codec DAI %s does not support sysclk\n", codec_dai->name);
++	        } else {
++        		    dev_err(card->dev, "failed to set codec dai sysclk: %d\n", ret);
++			    return ret;
++		}
++    	}
++
++
+ 	return 0;
+ }
+ static const struct snd_soc_ops mt8188_etdm_ops = {
+@@ -1246,6 +1267,8 @@ static struct snd_soc_dai_link mt8188_mt6359_dai_links[] = {
+ 			SND_SOC_DAIFMT_CBP_CFP,
+ 		.dpcm_capture = 1,
+ 		.ops = &mt8188_etdm_ops,
++               .codecs = etdm2_codecs,
++               .num_codecs = ARRAY_SIZE(etdm2_codecs),
+ 		SND_SOC_DAILINK_REG(etdm2_in),
+ 	},
+ 	[DAI_LINK_ETDM1_OUT_BE] = {
+@@ -1266,6 +1289,9 @@ static struct snd_soc_dai_link mt8188_mt6359_dai_links[] = {
+ 			SND_SOC_DAIFMT_CBC_CFC,
+ 		.dpcm_playback = 1,
+ 		.ops = &mt8188_etdm_ops,
++                .codecs = etdm2_codecs,
++                .num_codecs = ARRAY_SIZE(etdm2_codecs),
++
+ 		SND_SOC_DAILINK_REG(etdm2_out),
+ 	},
+ 	[DAI_LINK_ETDM3_OUT_BE] = {
+-- 
+2.49.0
+

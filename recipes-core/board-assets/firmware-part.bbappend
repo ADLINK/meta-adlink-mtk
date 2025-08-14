@@ -1,7 +1,7 @@
 
 SUMMARY += "Firmware vfat to Replace emmc sector size 512k with ufs sector size 4k"
 
-do_deploy() {
+do_deploy:lec-mtk1200 () {
 	#
 	# Step 1: Populate firmware directory structure
 	#

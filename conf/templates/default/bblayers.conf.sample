@@ -18,19 +18,13 @@ BBLAYERS ?= " \
   ##OEROOT##/../meta-mediatek-demo \
   ##OEROOT##/../meta-nn \
   ##OEROOT##/../meta-adlink-mtk \
-  ##OEROOT##/../meta-stress-test \
   ##OEROOT##/../meta-security \
   ##OEROOT##/../meta-openembedded/meta-multimedia \
-  ##OEROOT##/../meta-openembedded/meta-filesystems \
   ##OEROOT##/../meta-openembedded/meta-networking \
   ##OEROOT##/../meta-openembedded/meta-oe \
   ##OEROOT##/../meta-openembedded/meta-python \
   ##OEROOT##/../meta-openembedded/meta-perl \
   ##OEROOT##/../meta-rity/meta \
   ##OEROOT##/../meta-rity/meta-rity-bringup \
-  ##OEROOT##/../meta-rity/meta-rity-bsp \
   ##OEROOT##/../meta-rity/meta-rity-demo \
-  ##OEROOT##/../meta-tensorflow \
-  ##OEROOT##/../meta-browser/meta-chromium \
-  ##OEROOT##/../meta-lts-mixins \
   "

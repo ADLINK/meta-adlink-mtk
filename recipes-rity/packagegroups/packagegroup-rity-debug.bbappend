@@ -1,4 +1,4 @@
-RDEPENDS:${PN} = " \
+RDEPENDS:${PN}:lec-mtk1200 = " \
         devmem2 \
         gdb \
         i2c-tools \

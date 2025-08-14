@@ -1,0 +1,209 @@
+From 9e3960a115661ce26f1af305e0f957f1dd54d685 Mon Sep 17 00:00:00 2001
+From: "deepak.s" <deepak.s@adlinktech.com>
+Date: Thu, 31 Jul 2025 13:26:31 +0530
+Subject: [PATCH] fsource: add fsource driver to enable vefuse
+
+---
+ drivers/soc/mediatek/Kconfig       |  10 ++
+ drivers/soc/mediatek/Makefile      |   1 +
+ drivers/soc/mediatek/mtk-fsource.c | 159 +++++++++++++++++++++++++++++
+ 3 files changed, 170 insertions(+)
+ create mode 100644 drivers/soc/mediatek/mtk-fsource.c
+
+diff --git a/drivers/soc/mediatek/Kconfig b/drivers/soc/mediatek/Kconfig
+index 9bde86a4008e..0a23ff40470a 100644
+--- a/drivers/soc/mediatek/Kconfig
++++ b/drivers/soc/mediatek/Kconfig
+@@ -99,4 +99,14 @@ config MTK_HDMI_RX
+ 	  it supports HDMI 2.0.
+ 	  If unsure, say 'N'.
+ 
++config MTK_FSOURCE
++	tristate "MediaTek Fsource Support"
++	depends on MFD_MT6397
++	help
++	  If you say yes to this option, support will be included for the
++	  built-in MTK PMIC chips.
++
++	  Say m here if you want to include fsource support as a module. This
++	  will build a module called "mtk-fsource".
++
+ endmenu
+diff --git a/drivers/soc/mediatek/Makefile b/drivers/soc/mediatek/Makefile
+index 0319821454b2..daca15ee3c28 100644
+--- a/drivers/soc/mediatek/Makefile
++++ b/drivers/soc/mediatek/Makefile
+@@ -7,4 +7,5 @@ obj-$(CONFIG_MTK_REGULATOR_COUPLER) += mtk-regulator-coupler.o
+ obj-$(CONFIG_MTK_MMSYS) += mtk-mmsys.o
+ obj-$(CONFIG_MTK_MMSYS) += mtk-mutex.o
+ obj-$(CONFIG_MTK_SVS) += mtk-svs.o
++obj-$(CONFIG_MTK_FSOURCE) += mtk-fsource.o
+ obj-$(CONFIG_MTK_HDMI_RX) += hdmirx/
+diff --git a/drivers/soc/mediatek/mtk-fsource.c b/drivers/soc/mediatek/mtk-fsource.c
+new file mode 100644
+index 000000000000..c17aff4160c3
+--- /dev/null
++++ b/drivers/soc/mediatek/mtk-fsource.c
+@@ -0,0 +1,159 @@
++// SPDX-License-Identifier: GPL-2.0
++//
++// Copyright (c) 2019 MediaTek Inc.
++
++#include <linux/err.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/of_device.h>
++#include <linux/platform_device.h>
++#include <linux/pm_domain.h>
++#include <linux/regulator/consumer.h>
++#include <linux/slab.h>
++
++static struct regulator *buck;
++
++static const struct of_device_id fsource_of_match[] = {
++	{ .compatible = "mtk-fsource" },
++	{ }
++};
++
++MODULE_DEVICE_TABLE(of, fsource_of_match);
++
++static ssize_t reg_show_state(struct device *dev,
++			  struct device_attribute *attr, char *buf)
++{
++	if (!buck)
++		return sprintf(buf, "not exist\n");
++
++	if (regulator_is_enabled(buck))
++		return sprintf(buf, "enabled\n");
++
++	return sprintf(buf, "disabled\n");
++}
++
++static ssize_t reg_set_state(struct device *dev, struct device_attribute *attr,
++			 const char *buf, size_t count)
++{
++	bool enabled;
++	int ret;
++
++	if (!buck) {
++		dev_err(dev, "not exist\n");
++		return count;
++	}
++
++	/*
++	 * sysfs_streq() doesn't need the \n's, but we add them so the strings
++	 * will be shared with show_state(), above.
++	 */
++	if (sysfs_streq(buf, "enabled\n") || sysfs_streq(buf, "1"))
++		enabled = true;
++	else if (sysfs_streq(buf, "disabled\n") || sysfs_streq(buf, "0"))
++		enabled = false;
++	else {
++		dev_err(dev, "Configuring invalid mode\n");
++		return count;
++	}
++
++	if (enabled != regulator_is_enabled(buck)) {
++		if (enabled) {
++			ret = regulator_enable(buck);
++		} else {
++			ret = regulator_disable(buck);
++		}
++
++		if (ret != 0)
++			dev_err(dev, "Failed to configure state: %d\n", ret);
++	}
++
++	return count;
++}
++static DEVICE_ATTR(state, 0644, reg_show_state, reg_set_state);
++
++static struct attribute *attributes[] = {
++	&dev_attr_state.attr,
++	NULL,
++};
++
++static const struct attribute_group attr_group = {
++	.attrs	= attributes,
++};
++
++static int fsource_probe(struct platform_device *pdev)
++{
++	int ret = -EINVAL;
++
++	pr_notice("[%s]\n", __func__);
++
++	buck = regulator_get(&pdev->dev, "vfsource");
++	if (IS_ERR(buck)) {
++		pr_notice("%s: cannot get regulator \"vfsource-supply\"\n", __func__);
++		return IS_ERR(buck);
++	}
++
++	ret = sysfs_create_group(&pdev->dev.kobj, &attr_group);
++	if (ret != 0)
++		return ret;
++
++	return 0;
++}
++
++static int fsource_remove(struct platform_device *pdev)
++{
++	int ret = -EINVAL;
++
++	sysfs_remove_group(&pdev->dev.kobj, &attr_group);
++
++	ret = regulator_disable(buck);
++	if (ret)
++		pr_notice("%s: fail to disable vfsource power: %d\n", __func__, ret);
++
++	return 0;
++}
++
++static void fsource_shutdown(struct platform_device *pdev)
++{
++	int ret = -EINVAL;
++
++	sysfs_remove_group(&pdev->dev.kobj, &attr_group);
++
++	ret = regulator_disable(buck);
++	if (ret)
++		pr_notice("%s: fail to disable vfsource power: %d\n", __func__, ret);
++}
++
++static struct platform_driver fsource_driver = {
++	.driver		= {
++		.name		= "mtk-fsource",
++		.of_match_table	= of_match_ptr(fsource_of_match),
++	},
++	.probe		= fsource_probe,
++	.remove		= fsource_remove,
++	.shutdown	= fsource_shutdown,
++};
++
++static int __init fsource_init(void)
++{
++	int ret;
++
++	ret = platform_driver_register(&fsource_driver);
++	if (ret) {
++		pr_err("[%s] platform driver register failed: %d\n", __func__, ret);
++		return ret;
++	}
++
++	return 0;
++}
++late_initcall(fsource_init);
++
++static void __exit fsource_exit(void)
++{
++    platform_driver_unregister(&fsource_driver);
++}
++module_exit(fsource_exit);
++
++MODULE_AUTHOR("Hsin-Hsiung Wang, MediaTek");
++MODULE_DESCRIPTION("MediaTek Fsource Driver");
++MODULE_LICENSE("GPL v2");
+-- 
+2.49.0
+
