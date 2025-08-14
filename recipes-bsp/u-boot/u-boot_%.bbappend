@@ -1,6 +1,9 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:absolute-vision := "${THISDIR}/${PN}/absolute-vision:"
+FILESEXTRAPATHS:prepend:lec-mtk1200 := "${THISDIR}/${PN}/lec-mtk1200:"
 
-SRC_URI:append = " ${UBOOT_SRC_PATCHES}"
+SRC_URI:append:absolute-vision = "file://0001-Create-absolute-vision-machine.patch" 
+
+SRC_URI:append:lec-mtk1200 = "${UBOOT_SRC_PATCHES}"
 
 do_copy_source () {
   configs=$(echo "${UBOOT_MACHINE}" | xargs)
@@ -39,9 +42,12 @@ do_copy_source () {
   done
 }
 
-addtask do_copy_source before do_patch after do_unpack
+python () {
+    if d.getVar('MACHINE') != 'absolute-vision':
+        bb.build.addtask('do_copy_source', 'do_patch', 'do_unpack', d)
+}
 
+UBOOT_LOCALVERSION:lec-mkt1200 = "-adlink"
 
-
-UBOOT_LOCALVERSION = "-adlink"
+UBOOT_LOCALVERSION:absolute-vision = "-absolute-vision-4v0.0.0"
 
