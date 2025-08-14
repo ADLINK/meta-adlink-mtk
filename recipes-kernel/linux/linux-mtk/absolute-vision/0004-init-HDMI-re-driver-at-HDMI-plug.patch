@@ -1,0 +1,105 @@
+From b2920f417fcf3055b75ae0899fec940eeae9fbd3 Mon Sep 17 00:00:00 2001
+From: "deepak.s" <deepak.s@adlinktech.com>
+Date: Thu, 31 Jul 2025 13:08:06 +0530
+Subject: [PATCH] init HDMI re-driver at HDMI plug
+
+---
+ drivers/gpu/drm/mediatek/mtk_mt8195_hdmi.c | 68 +++++++++++++++++++++-
+ 1 file changed, 67 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_mt8195_hdmi.c b/drivers/gpu/drm/mediatek/mtk_mt8195_hdmi.c
+index e6fe151b4bef..d901fd5fb965 100644
+--- a/drivers/gpu/drm/mediatek/mtk_mt8195_hdmi.c
++++ b/drivers/gpu/drm/mediatek/mtk_mt8195_hdmi.c
+@@ -61,7 +61,35 @@
+ #define MT8195_HDMI_SPD_BUFFER_SIZE (31)
+ #define MT8195_HDMI_AVI_BUFFER_SIZE (17)
+ 
+-static inline struct mtk_hdmi *hdmi_ctx_from_conn(struct drm_connector *c)
++// define re-driver(PI3HDX1204) init data for SI
++#define PI3HD_ADDR 0x76
++#define PI3HD_CNT 4
++#define PI3HD_REG_ADDR_1 0x03
++#define PI3HD_REG_ADDR_2 0x04
++#define PI3HD_REG_ADDR_3 0x05
++#define PI3HD_REG_ADDR_4 0x06
++#define PI3HD_REG_VALUE_1 0x7d
++#define PI3HD_REG_VALUE_2 0x3d
++#define PI3HD_REG_VALUE_3 0x3b
++#define PI3HD_REG_VALUE_4 0x3d
++
++
++
++static inline struct mtk_hdmi *
++
++// define re-driver(PI3HDX1204) init data for SI
++#define PI3HD_ADDR 0x76
++#define PI3HD_CNT 4
++#define PI3HD_REG_ADDR_1 0x03
++#define PI3HD_REG_ADDR_2 0x04
++#define PI3HD_REG_ADDR_3 0x05
++#define PI3HD_REG_ADDR_4 0x06
++#define PI3HD_REG_VALUE_1 0x7d
++#define PI3HD_REG_VALUE_2 0x3d
++#define PI3HD_REG_VALUE_3 0x3b
++#define PI3HD_REG_VALUE_4 0x3d
++
++hdmi_ctx_from_conn(struct drm_connector *c)
+ {
+ 	return container_of(c, struct mtk_hdmi, conn);
+ }
+@@ -1565,6 +1593,43 @@ static void mtk_hdmi_handle_plugged_change(struct mtk_hdmi *hdmi, bool plugged)
+ 		hdmi->plugged_cb(hdmi->codec_dev, plugged);
+ }
+ 
++static void adlink_init_hdmi_re_driver(struct drm_bridge *bridge)
++{
++       struct mtk_hdmi *hdmi = hdmi_ctx_from_bridge(bridge);
++       struct i2c_adapter *adapter;
++       struct i2c_msg msg;
++       const u8 buffer[][2]={
++               {0x03, 0x7d},
++               {0x04, 0x3d},
++               {0x05, 0x3b},
++               {0x06, 0x3d}
++       };
++       u8 i, ret;
++
++       // get I2C bus 0
++       adapter = i2c_get_adapter(0);
++       if (!adapter)
++       {
++               dev_err(hdmi->dev, "No bus 0\n");
++               return;
++       }
++    // set i2c content
++       msg.addr  = PI3HD_ADDR;
++       msg.flags = 0;  // 0 for write
++       msg.len   = 2;
++       for (i = 0; i < PI3HD_CNT; i++) {
++               msg.buf   = &buffer[i][0];
++               ret = i2c_transfer(adapter, &msg, 1);
++               if (ret < 0) {
++                       pr_err("I2C transfer failed\n");
++                       i2c_put_adapter(adapter);
++                       return;
++               }
++       }
++       i2c_put_adapter(adapter);
++}
++
++
+ static void mtk_hdmi_bridge_atomic_post_disable(struct drm_bridge *bridge,
+ 						struct drm_bridge_state *old_state)
+ {
+@@ -1596,6 +1661,7 @@ static void mtk_hdmi_bridge_atomic_pre_enable(struct drm_bridge *bridge,
+ 		.dp = { .link_rate = hdmi->mode.clock * 1000 }
+ 	};
+ 
++       adlink_init_hdmi_re_driver(bridge);
+ 	DRM_DEV_DEBUG_DRIVER(hdmi->dev, "[%s][%d]\n", __func__, __LINE__);
+ 
+ 	/* Retrieve the connector through the atomic state */
+-- 
+2.49.0
+
