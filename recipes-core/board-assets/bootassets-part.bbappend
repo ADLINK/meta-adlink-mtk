@@ -1,13 +1,13 @@
 
 SUMMARY += "Bootassets vfat to replace emmc sector size 512k with ufs sector size 4k"
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:lec-mtk1200 := "${THISDIR}/files:"
 
 SRC_URI = " \
     file://logo.bmp \
 "
 
 
-do_deploy() {
+do_deploy:lec-mtk1200 () {
 	mkdir -p ${BOOTASSETS_IMAGE_FS}
 	collect_artifacts
 
