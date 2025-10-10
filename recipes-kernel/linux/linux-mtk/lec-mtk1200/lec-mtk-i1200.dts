@@ -1058,7 +1058,7 @@
         usb-role-switch;
         dr_mode = "otg"; /* host, peripheral, otg */
         /delete-property/ wakeup-source;
-        status = "disabled";
+        status = "okay";
 
         connector {
                 compatible = "gpio-usb-b-connector", "usb-b-connector";

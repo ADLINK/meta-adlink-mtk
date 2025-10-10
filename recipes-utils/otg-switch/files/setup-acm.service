@@ -1,0 +1,15 @@
+[Unit]
+Description=USB gadget (ADB+RNDIS+ACM) interface
+
+After=usbgadget.service 
+Requires=usbgadget.service
+After=multi-user.target network.target some-other.service
+
+[Service]
+Type=oneshot
+ExecStart=/lib/systemd/setup-acm.sh --start
+RemainAfterExit=true
+ExecStop=/lib/systemd/setup-acm.sh --stop
+
+[Install]
+WantedBy=multi-user.target
