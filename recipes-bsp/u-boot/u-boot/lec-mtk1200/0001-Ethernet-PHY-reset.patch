@@ -1,0 +1,44 @@
+From 165a51666a8457c107ed838a72379eeb362004df Mon Sep 17 00:00:00 2001
+From: "aravindlal.mh" <aravindlal.mh@adlinktech.com>
+Date: Thu, 11 Sep 2025 18:09:00 +0530
+Subject: [PATCH] Ethernet PHY reset
+
+---
+ board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c b/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
+index faf6a3bb47..1377f4abf3 100755
+--- a/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
++++ b/board/mediatek/lec_mtk_i1200/lec_mtk_i1200.c
+@@ -281,6 +281,20 @@ static void setup_dsi(void)
+    		run_command(dsisetup, 0);
+ }
+ 
++static void reset_ethphy(void)
++{
++	char ethphy_reset[255];
++	sprintf(ethphy_reset,"i2c dev 4 ; i2c mw 0x3e 0x7d 0x12 1; i2c mw 0x3e 0x7d 0x34 1");
++	run_command(ethphy_reset, 0);
++
++	gpio_request(93, "phy_strap");
++	gpio_direction_output(93, 0);
++	mdelay(5);
++	gpio_direction_output(93, 1);
++
++}
++
++
+ int board_late_init(void)
+ {
+ 	char *boot_conf_orig = env_get("boot_conf");
+@@ -344,5 +358,6 @@ int board_late_init(void)
+     }
+     board_usbgpio_init();
+     setup_dsi();
++    reset_ethphy();
+     return 0;
+ }
+-- 
+2.25.1
+
