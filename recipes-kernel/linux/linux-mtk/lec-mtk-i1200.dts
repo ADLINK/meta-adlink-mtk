@@ -778,10 +778,12 @@
     phy-handle = <&dp83867>;
     pinctrl-names = "default";
     pinctrl-0 = <&eth_default>;
+    pinctrl-1 = <&eth_sleep>;
     snps,reset-active-low;
     snps,reset-delays-us = <0 10000 10000>;
     mediatek,tx-delay-ps = <2030>;
     snps,reset-gpio = <&pio 93 GPIO_ACTIVE_HIGH>;
+    mediatek,mac-wol;
     eeprom = <&eeprom>;
     status = "okay";
 
