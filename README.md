@@ -1,4 +1,4 @@
-This repo is dedicated to the MTK I1200-based modules. Here you can find the Yocto BSP recipes.
+This repo is dedicated to the MediaTek SoC based modules. Here you can find the Yocto BSP recipes.
 
 You can follow the same steps to build your own customized BSP based on your interests.
 
@@ -7,15 +7,15 @@ You can follow the same steps to build your own customized BSP based on your int
 | Product    |                    Hardware Documentation                    |
 | :--------- | :----------------------------------------------------------: |
 | LEC-MTK-I1200 | [Click_here](https://www.adlinktech.com/Products/Computer_on_Modules/SMARC/LEC-MTK-I1200) |
+| OSM-MTK-510 | [Click_here](https://www.adlinktech.com/products/computer_on_modules/osm/osm-mtk510?lang=en) |
 
 
 # 2. Available Branches
 
 1. [rity-kirkstone-v23.2](https://github.com/ADLINK/meta-adlink-MTK/tree/rity-kirkstone-v23.2)
-
 2. [rity-kirkstone-v23.1](https://github.com/ADLINK/meta-adlink-MTK/tree/rity-kirkstone-v23.1)
-
-3. [rity-kirkstone-v24.1](https://github.com/ADLINK/meta-adlink-MTK/tree/rity-kirkstone-v24.1)
+3. [rity-kirkstone-24.0](https://github.com/ADLINK/meta-adlink-mtk/tree/rity-kirkstone-v24.0)(Only for OSM-MTK-510 with EBx carrier)
+4. [rity-kirkstone-v24.1](https://github.com/ADLINK/meta-adlink-MTK/tree/rity-kirkstone-v24.1)
 
 
 
