@@ -599,12 +599,13 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 	status = "okay";
+	
+        spidev@0 {
+		compatible = "rohm,dh2228fv";
+		spi-max-frequency = <5000000>;
+		reg = <0>;
+	};
 
-        w25q64dw: spi-flash@0 {
-                compatible = "winbond,w25q64dw", "jedec,spi-nor";
-                reg = <0>;
-                spi-max-frequency = <25000000>;
-        };
 };
 
 &ssusb {
@@ -1036,6 +1037,18 @@
 			bias-disable;
 		};
 	};
+
+        nor_pins: nor-pins {
+                pins {
+                        pinmux = <PINMUX_GPIO140__FUNC_SPINOR_CS>,
+                                 <PINMUX_GPIO141__FUNC_SPINOR_CK>,
+                                 <PINMUX_GPIO142__FUNC_SPINOR_IO0>,
+                                 <PINMUX_GPIO143__FUNC_SPINOR_IO1>,
+                                 <PINMUX_GPIO130__FUNC_SPINOR_IO2>,
+                                 <PINMUX_GPIO131__FUNC_SPINOR_IO3>;
+                        bias-disable;
+                };
+        };
 
 	spi1_pins: spi1-pins {
 		pins {
