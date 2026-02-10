@@ -292,8 +292,8 @@
 	spi-flash@0{
 		compatible = "jedec,spi-nor";
 		reg = <0>;
-		#spi-tx-bus-width = <1>;
-		#spi-rx-bus-width = <4>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
 		#u-boot,dm-pre-reloc;
 	};
 };
