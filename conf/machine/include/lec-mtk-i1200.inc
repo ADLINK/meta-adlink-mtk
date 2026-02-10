@@ -16,6 +16,7 @@ EXTRA_KERNEL_PATCHES = " \
         file://0007-Added-PCIe-compliance-test-support.patch \
         file://0008-Added-support-imx219-camera.patch \
 	file://0009-Added-TLV320AIC3C-and-w8960-codec-support.patch \
+        file://0012-Enable-dual-mode-and-quad-mode-support-for-the-mx25u.patch \
 "
 
 EXTRA_KERNEL_DTS = " \
@@ -47,9 +48,11 @@ EXTRA_UBOOT_PATCHES = " \
 	file://boot.script.its \
 	file://0001-Added-Board-support-for-LEC-MTK-i1200.patch \
 	file://0002-Enable-Clock-for-Adlink-configuration.patch \
+	file://0002-LEC-MTK1200-QSPI-to-support-Bootlogo.patch \
 	file://0003-Added-interfacetest-environment-variable-to-list.patch \
 	file://0005-Added-DSI-panel-support.patch \
 	file://0006-Eth-power-support.patch \
+       file://0007-Enable-OE-bit-for-nor-spi-mx25u.patch \
 "
 EXTRA_UBOOT_8MB_PATCHES = " ${@bb.utils.contains("MACHINE_FEATURES", "8MB-NOR", " file://0002-Modify-Boot-assets-partition-offset.patch ", "", d)}  "	
 EXTRA_UBOOT_PATCHES:append = " ${EXTRA_UBOOT_8MB_PATCHES} "			
