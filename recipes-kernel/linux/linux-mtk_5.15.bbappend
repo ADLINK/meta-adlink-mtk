@@ -83,9 +83,9 @@ do_copy_source () {
 
 
 
-addtask copy_source before do_patch after do_unpack
+addtask do_copy_source after do_kernel_configme before do_configure
 
-addtask copy_defconfig after do_kernel_configme before do_configure
+addtask do_copy_defconfig after do_copy_source before do_configure
 
 do_copy_defconfig () {
 	sed -i 's/\-mtk/\${LINUX_VERSION_EXTENSION}/g' ${S}/arch/arm64/configs/adlink_lec_i1200_defconfig
