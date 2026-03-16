@@ -63,5 +63,9 @@ SRC_URI:append = " \
         file://camera-imx214-cam2.dts \
 "
 
+SRC_URI:append:lec-mtk-i1200-qspi = "\ 
+	file://nor-qspi.dts \
+"
+
 COMPATIBLE_MACHINE = "lec*"
 

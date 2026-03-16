@@ -1,0 +1,139 @@
+From 0cd16015fea9c2b0cde4ba3910a71b4e4ac085fa Mon Sep 17 00:00:00 2001
+From: ot909507 <ot_meiker.gao@mediatek.com>
+Date: Fri, 5 Sep 2025 14:46:10 +0800
+Subject: [PATCH] GENIO: mtd: enable dual and quad mode for Macronix MX25U25635
+
+Enable dual mode and quad mode support for the mx25u25635f
+
+Change-Id: I548ec869f13f2ee61803160ba97333d8deec23c6
+Signed-off-by: ot909507 <ot_meiker.gao@mediatek.com>
+---
+ drivers/mtd/spi-nor/macronix.c | 16 +++++++++++++++-
+ drivers/spi/spi-mtk-nor.c      | 14 +++++++-------
+ 2 files changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/mtd/spi-nor/macronix.c b/drivers/mtd/spi-nor/macronix.c
+index 27498ed0cc0d..aece63a15e50 100644
+--- a/drivers/mtd/spi-nor/macronix.c
++++ b/drivers/mtd/spi-nor/macronix.c
+@@ -32,6 +32,18 @@ static struct spi_nor_fixups mx25l25635_fixups = {
+ 	.post_bfpt = mx25l25635_post_bfpt_fixups,
+ };
+ 
++static void mx25u25635f_fixup_default_init(struct spi_nor *nor)
++{
++	nor->params->hwcaps.mask |= SNOR_HWCAPS_READ_1_1_4;
++	nor->read_opcode = SPINOR_OP_READ_1_1_4;
++	nor->read_proto = SNOR_PROTO_1_1_4;
++	nor->read_dummy = 8;
++}
++
++static const struct spi_nor_fixups mx25u25635f_fixups = {
++    .default_init = mx25u25635f_fixup_default_init,
++};
++
+ static const struct flash_info macronix_parts[] = {
+ 	/* Macronix */
+ 	{ "mx25l512e",   INFO(0xc22010, 0, 64 * 1024,   1, SECT_4K) },
+@@ -65,7 +77,9 @@ static const struct flash_info macronix_parts[] = {
+ 			      SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ)
+ 		.fixups = &mx25l25635_fixups },
+ 	{ "mx25u25635f", INFO(0xc22539, 0, 64 * 1024, 512,
+-			      SECT_4K | SPI_NOR_4B_OPCODES) },
++			       SECT_4K | SPI_NOR_DUAL_READ |
++			       SPI_NOR_QUAD_READ | SPI_NOR_SKIP_SFDP)
++		.fixups = &mx25u25635f_fixups},
+ 	{ "mx25u51245g", INFO(0xc2253a, 0, 64 * 1024, 1024,
+ 			      SECT_4K | SPI_NOR_DUAL_READ |
+ 			      SPI_NOR_QUAD_READ | SPI_NOR_4B_OPCODES) },
+diff --git a/drivers/spi/spi-mtk-nor.c b/drivers/spi/spi-mtk-nor.c
+index 6d203477c04b..b9931803ae8f 100644
+--- a/drivers/spi/spi-mtk-nor.c
++++ b/drivers/spi/spi-mtk-nor.c
+@@ -314,7 +314,6 @@ static bool mtk_nor_supports_op(struct spi_mem *mem,
+ static void mtk_nor_setup_bus(struct mtk_nor *sp, const struct spi_mem_op *op)
+ {
+ 	u32 reg = 0;
+-
+ 	if (op->addr.nbytes == 4)
+ 		reg |= MTK_NOR_4B_ADDR;
+ 
+@@ -323,6 +322,8 @@ static void mtk_nor_setup_bus(struct mtk_nor *sp, const struct spi_mem_op *op)
+ 		writeb(op->cmd.opcode, sp->base + MTK_NOR_REG_PRGDATA(4));
+ 		if (op->addr.buswidth == 4)
+ 			reg |= MTK_NOR_QUAD_ADDR;
++	//	dev_err(sp->dev, "mtk_nor: Quad mode! opcode=0x%02x, addr.buswidth=%d, data.buswidth=%d\n",
++       //      op->cmd.opcode, op->addr.buswidth, op->data.buswidth);
+ 	} else if (op->data.buswidth == 2) {
+ 		reg |= MTK_NOR_DUAL_READ;
+ 		writeb(op->cmd.opcode, sp->base + MTK_NOR_REG_PRGDATA(3));
+@@ -333,6 +334,9 @@ static void mtk_nor_setup_bus(struct mtk_nor *sp, const struct spi_mem_op *op)
+ 			mtk_nor_rmw(sp, MTK_NOR_REG_CFG1, MTK_NOR_FAST_READ, 0);
+ 		else
+ 			mtk_nor_rmw(sp, MTK_NOR_REG_CFG1, 0, MTK_NOR_FAST_READ);
++
++	//	dev_err(sp->dev, "mtk_nor: Standard mode! opcode=0x%02x, addr.buswidth=%d, data.buswidth=%d\n",
++       //      op->cmd.opcode, op->addr.buswidth, op->data.buswidth);
+ 	}
+ 	mtk_nor_rmw(sp, MTK_NOR_REG_BUSCFG, reg, MTK_NOR_BUS_MODE_MASK);
+ }
+@@ -511,7 +515,6 @@ static int mtk_nor_spi_mem_prg(struct mtk_nor *sp, const struct spi_mem_op *op)
+ 		tx_len += op->dummy.nbytes + op->data.nbytes;
+ 	else if (op->data.dir == SPI_MEM_DATA_IN)
+ 		rx_len = op->data.nbytes;
+-
+ 	prg_len = op->cmd.nbytes + op->addr.nbytes + op->dummy.nbytes +
+ 		  op->data.nbytes;
+ 
+@@ -522,7 +525,6 @@ static int mtk_nor_spi_mem_prg(struct mtk_nor *sp, const struct spi_mem_op *op)
+ 	    (rx_len > MTK_NOR_REG_SHIFT_MAX + 1) ||
+ 	    (prg_len > MTK_NOR_PRG_CNT_MAX / 8))
+ 		return -EINVAL;
+-
+ 	// fill tx data
+ 	for (i = op->cmd.nbytes; i > 0; i--, reg_offset--) {
+ 		reg = sp->base + MTK_NOR_REG_PRGDATA(reg_offset);
+@@ -552,7 +554,6 @@ static int mtk_nor_spi_mem_prg(struct mtk_nor *sp, const struct spi_mem_op *op)
+ 		reg = sp->base + MTK_NOR_REG_PRGDATA(reg_offset);
+ 		writeb(0, reg);
+ 	}
+-
+ 	// trigger op
+ 	writel(prg_len * BITS_PER_BYTE, sp->base + MTK_NOR_REG_PRG_CNT);
+ 	ret = mtk_nor_cmd_exec(sp, MTK_NOR_CMD_PROGRAM,
+@@ -568,7 +569,6 @@ static int mtk_nor_spi_mem_prg(struct mtk_nor *sp, const struct spi_mem_op *op)
+ 			((u8 *)(op->data.buf.in))[i] = readb(reg);
+ 		}
+ 	}
+-
+ 	return 0;
+ }
+ 
+@@ -580,7 +580,6 @@ static int mtk_nor_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
+ 	if ((op->data.nbytes == 0) ||
+ 	    ((op->addr.nbytes != 3) && (op->addr.nbytes != 4)))
+ 		return mtk_nor_spi_mem_prg(sp, op);
+-
+ 	if (op->data.dir == SPI_MEM_DATA_OUT) {
+ 		mtk_nor_set_addr(sp, op);
+ 		writeb(op->cmd.opcode, sp->base + MTK_NOR_REG_PRGDATA0);
+@@ -588,7 +587,6 @@ static int mtk_nor_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
+ 			return mtk_nor_pp_buffered(sp, op);
+ 		return mtk_nor_pp_unbuffered(sp, op);
+ 	}
+-
+ 	if ((op->data.dir == SPI_MEM_DATA_IN) && mtk_nor_match_read(op)) {
+ 		ret = mtk_nor_write_buffer_disable(sp);
+ 		if (ret < 0)
+@@ -746,6 +744,8 @@ static const struct spi_controller_mem_ops mtk_nor_mem_ops = {
+ static const struct of_device_id mtk_nor_match[] = {
+ 	{ .compatible = "mediatek,mt8192-nor", .data = (void *)36 },
+ 	{ .compatible = "mediatek,mt8173-nor", .data = (void *)32 },
++	{ .compatible = "mediatek,mt8195-nor", .data = (void *)32 },
++
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, mtk_nor_match);
+-- 
+2.45.2
+

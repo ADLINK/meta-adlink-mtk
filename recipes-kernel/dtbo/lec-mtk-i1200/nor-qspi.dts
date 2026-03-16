@@ -1,0 +1,41 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	fragment@0 {
+		target = <&nor_flash>;
+		__overlay__ {
+			status = "okay";
+			pinctrl-names = "default";
+		        pinctrl-0 = <&nor_pins>;
+
+		        flash@0 {
+                		compatible = "jedec,spi-nor";
+		                reg = <0>;
+		                spi-tx-bus-width = <4>;
+		                spi-rx-bus-width = <4>;
+      				  };
+			};
+	};
+
+	fragment@1 {
+		target = <&ssusb1>;
+		__overlay__ {
+			dr_mode = "host";
+		};
+	};
+
+	fragment@2 {
+		target = <&usb_p2_pins>;
+		__overlay__ {
+			/delete-node/ pin_iddig;
+		};
+	};
+
+	fragment@3 {
+		target = <&spi2>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+};
