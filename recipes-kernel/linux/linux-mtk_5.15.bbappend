@@ -1,8 +1,10 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:lec-mtk1200 := "${THISDIR}/${PN}/lec-mtk1200:"
+FILESEXTRAPATHS:prepend:osm-mtk510 := "${THISDIR}/${PN}/osm-mtk510:"
 
 SRC_URI:append = " ${KERNEL_SRC_PATCHES}"
 
-LINUX_VERSION_EXTENSION = "-lec-mtki1200-24.1"
+LINUX_VERSION_EXTENSION:lec-mtk1200  = "-lec-mtki1200-24.1"
+LINUX_VERSION_EXTENSION:osm-mtk510  = "-osm-mtk510-24.1"
 
 do_copy_source () {
   configs=$(echo "${KERNEL_CONFIG_AARCH64}" | xargs)
@@ -87,9 +89,10 @@ addtask do_copy_source after do_kernel_configme before do_configure
 
 addtask do_copy_defconfig after do_copy_source before do_configure
 
-do_copy_defconfig () {
-	sed -i 's/\-mtk/\${LINUX_VERSION_EXTENSION}/g' ${S}/arch/arm64/configs/adlink_lec_i1200_defconfig
-	cp ${S}/arch/arm64/configs/adlink_lec_i1200_defconfig ${B}/.config
-	cp ${S}/arch/arm64/configs/adlink_lec_i1200_defconfig ${B}/../defconfig
+do_copy_defconfig() {
+	configs=$(echo "${KERNEL_CONFIG_AARCH64}" | xargs)
+	sed -i 's/\-mtk/\${LINUX_VERSION_EXTENSION}/g' ${S}/arch/arm64/configs/${configs}
+	cp ${S}/arch/arm64/configs/${configs} ${B}/.config
+	cp ${S}/arch/arm64/configs/${configs} ${B}/../defconfig
 }
 
