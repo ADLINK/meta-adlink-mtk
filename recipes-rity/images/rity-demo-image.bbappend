@@ -13,6 +13,15 @@ modules_load() {
 	cp ${ADDON_FILES_DIR}/adlink.conf ${IMAGE_ROOTFS}/etc/modprobe.d/adlink.conf
 	cp ${ADDON_FILES_DIR}/moal.conf ${IMAGE_ROOTFS}/etc/modules-load.d/moal.conf
 }
+
+copy_adlink_prebuilts() {
+    tar -xzf ${ADDON_FILES_DIR}/adlink-camisp-prebuilts.tar.gz -C ${IMAGE_ROOTFS}
+    tar -xzf ${ADDON_FILES_DIR}/adlink_ewriter.tar.gz -C ${IMAGE_ROOTFS}
+}
+
+
 ROOTFS_POSTPROCESS_COMMAND += "install_fw; modules_load;"
 
+
+ROOTFS_POSTPROCESS_COMMAND:append:osm-mtk510 += "copy_adlink_prebuilts;"
 
