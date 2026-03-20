@@ -1,0 +1,28 @@
+From f2ddc8c33050cf5f7fc53f8398a9ca3f47e3d100 Mon Sep 17 00:00:00 2001
+From: "deepak.s" <deepak.s@adlinktech.com>
+Date: Tue, 27 Aug 2024 11:40:26 +0530
+Subject: [PATCH] Added interfacetest environment variable to list interface
+ status
+
+---
+ include/config_distro_bootcmd.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/config_distro_bootcmd.h b/include/config_distro_bootcmd.h
+index 5506f3168f..bb8263a2ec 100644
+--- a/include/config_distro_bootcmd.h
++++ b/include/config_distro_bootcmd.h
+@@ -495,6 +495,10 @@
+ 		"done; "                                                  \
+ 		"setenv devplist\0"					  \
+ 	\
++	"interfacetest=usb reset; echo ;usb tree;echo ;net list;echo ;"     \
++	"i2c bus; echo ;gpio status -a;echo ;setenv ipaddr 192.168.1.111 ;" \
++	"setenv serverip 192.168.1.1; ping $serverip\0"        		    \
++	\
+ 	BOOT_TARGET_DEVICES(BOOTENV_DEV)                                  \
+ 	\
+ 	"distro_bootcmd=" BOOTENV_SET_SCSI_NEED_INIT                      \
+-- 
+2.45.2
+
