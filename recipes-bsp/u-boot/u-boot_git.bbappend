@@ -1,4 +1,7 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:osm-mtk510 := "${THISDIR}/${PN}/osm-mtk510:"
+FILESEXTRAPATHS:prepend:lec-mtk1200 := "${THISDIR}/${PN}/lec-mtk1200:"
+
+UBOOT_LOCALVERSION:osm-mtk510 = "-osm-mtk510-24.1"
 
 SRC_URI:append = " ${UBOOT_SRC_PATCHES}"
 

@@ -1,0 +1,86 @@
+From 01c859ef240fdb7bd19755fd90fe9f051553d82c Mon Sep 17 00:00:00 2001
+From: Tim Liang <tim.liang@adlinktech.com>
+Date: Fri, 21 Mar 2025 11:49:56 +0800
+Subject: [PATCH] Enable audio codec tlv320aic3106
+
+---
+ sound/soc/mediatek/mt8188/mt8390-evk.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/sound/soc/mediatek/mt8188/mt8390-evk.c b/sound/soc/mediatek/mt8188/mt8390-evk.c
+index ade8fcfadd8e..8e8b60474a45 100644
+--- a/sound/soc/mediatek/mt8188/mt8390-evk.c
++++ b/sound/soc/mediatek/mt8188/mt8390-evk.c
+@@ -20,6 +20,7 @@
+ #include "../common/mtk-soundcard-driver.h"
+ #include "mt8188-afe-clk.h"
+ #include "mt8188-afe-common.h"
++#include <linux/kernel.h>
+ 
+ #define SOF_DMA_DL2 "SOF_DMA_DL2"
+ #define SOF_DMA_DL3 "SOF_DMA_DL3"
+@@ -52,6 +53,13 @@ static struct snd_soc_jack_pin mt8188_dp_jack_pins[] = {
+ 	},
+ };
+ 
++static struct snd_soc_dai_link_component etdm2_out_codecs[] = {
++	{
++        .name = "tlv320aic3x-codec",
++        .dai_name = "tlv320aic3x-hifi",
++	},
++};
++
+ static const struct snd_soc_dapm_widget
+ 	mt8188_mt6359_widgets[] = {
+ 	SND_SOC_DAPM_HP("Headphone", NULL),
+@@ -251,17 +259,28 @@ static int mt8188_etdm_hw_params(struct snd_pcm_substream *substream,
+ 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
+ 	struct snd_soc_card *card = rtd->card;
+ 	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(rtd, 0);
++    struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
+ 	unsigned int rate = params_rate(params);
+ 	unsigned int mclk_fs_ratio = 128;
+ 	unsigned int mclk_fs = rate * mclk_fs_ratio;
+ 	int ret;
+-
++    dev_info(card->dev, "codec_dai->name: %s", codec_dai->name);
+ 	ret = snd_soc_dai_set_sysclk(cpu_dai, 0, mclk_fs, SND_SOC_CLOCK_OUT);
+ 	if (ret) {
+ 		dev_err(card->dev, "failed to set sysclk\n");
+ 		return ret;
+ 	}
+ 
++    ret = snd_soc_dai_set_sysclk(codec_dai, 0, mclk_fs, SND_SOC_CLOCK_IN);
++    if (ret) {
++        if (ret == -ENOTSUPP) {
++            dev_err(card->dev, "Codec DAI %s does not support sysclk\n", codec_dai->name);
++        } else {
++            dev_err(card->dev, "failed to set codec dai sysclk: %d\n", ret);
++            return ret;
++        }
++    }
++
+ 	return 0;
+ }
+ 
+@@ -734,6 +753,8 @@ static struct snd_soc_dai_link mt8188_mt6359_dai_links[] = {
+ 			SND_SOC_DAIFMT_CBP_CFP,
+ 		.dpcm_capture = 1,
+ 		.ops = &mt8188_etdm_ops,
++		.codecs = etdm2_out_codecs,
++		.num_codecs = ARRAY_SIZE(etdm2_out_codecs),
+ 		SND_SOC_DAILINK_REG(ETDM2_IN_BE),
+ 	},
+ 	[DAI_LINK_ETDM1_OUT_BE] = {
+@@ -754,6 +775,8 @@ static struct snd_soc_dai_link mt8188_mt6359_dai_links[] = {
+ 			SND_SOC_DAIFMT_CBC_CFC,
+ 		.dpcm_playback = 1,
+ 		.ops = &mt8188_etdm_ops,
++		.codecs = etdm2_out_codecs,
++		.num_codecs = ARRAY_SIZE(etdm2_out_codecs),
+ 		SND_SOC_DAILINK_REG(ETDM2_OUT_BE),
+ 	},
+ 	[DAI_LINK_ETDM3_OUT_BE] = {
+-- 
+2.17.1
+
