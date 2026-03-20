@@ -1,0 +1,38 @@
+From f14050146ddb0636129c436f95d498f195680919 Mon Sep 17 00:00:00 2001
+From: Aravindlal <aravindlal.mh@adlinktech.com>
+Date: Tue, 25 Nov 2025 15:46:24 +0530
+Subject: [PATCH] LEC-MTK1200: QSPI to support Bootlogo
+
+---
+ drivers/video/mediatek/Kconfig  | 4 ++++
+ include/configs/lec_mtk_i1200.h | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/video/mediatek/Kconfig b/drivers/video/mediatek/Kconfig
+index 7654a4fca9..fc12301c01 100644
+--- a/drivers/video/mediatek/Kconfig
++++ b/drivers/video/mediatek/Kconfig
+@@ -10,3 +10,7 @@ config VIDEO_MEDIATEK
+ 	select DISPLAY
+ 	help
+ 	  Enable Mediatek video support.
++
++config SPLASH_FS
++    string "choose Splash filesystem"
++    default "scsi_fs"
+diff --git a/include/configs/lec_mtk_i1200.h b/include/configs/lec_mtk_i1200.h
+index 64f7a19364..696da810ca 100755
+--- a/include/configs/lec_mtk_i1200.h
++++ b/include/configs/lec_mtk_i1200.h
+@@ -112,7 +112,7 @@
+ 	"bootargs=net.ifnames=0\0" \
+ 	"fdtfile=" CONFIG_DEFAULT_DEVICE_TREE ".dtb\0" \
+ 	"splashimage=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0" \
+-	"splashsource=scsi_fs\0" \
++	"splashsource="CONFIG_SPLASH_FS"\0" \
+ 	"splashfile=logo.bmp\0" \
+ 	"splashdevpart=2#bootassets\0" \
+ 	"splashpos=m,m\0" \
+-- 
+2.50.1
+
