@@ -9,4 +9,5 @@ RDEPENDS:${PN} = " \
         stress-ng \
         powertop \
 "
+RDEPENDS:${PN}:remove:osm-mtk510 = "opengl-es-cts vulkan-cts"
 
