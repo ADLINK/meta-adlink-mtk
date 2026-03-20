@@ -1,0 +1,10 @@
+[Unit]
+Description=Auto reboot
+
+[Service]
+Type=idle
+ExecStart=/home/root/tools/reboot-script.sh
+StandardOutput=kmsg+console
+
+[Install]
+WantedBy=multi-user.target
