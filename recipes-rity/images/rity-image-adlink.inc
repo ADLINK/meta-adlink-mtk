@@ -1,6 +1,7 @@
 #LEC-MTK1200
 # Tools
-IMAGE_INSTALL:append:lec-mtk1200 = " mtd-utils mdio-tool pciutils canutils atecc-util eltt2 update-eth-mac resize-script "
+# Removed resize-script as same script provided by base-files as expand-rootfs by MTK
+IMAGE_INSTALL:append:lec-mtk1200 = " mtd-utils mdio-tool pciutils canutils atecc-util eltt2 update-eth-mac "
 #IMAGE_INSTALL += " linux-firmware-iwlwifi "
 #IMAGE_INSTALL += " docker python3-docker-compose "
 
