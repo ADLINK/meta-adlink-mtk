@@ -4,6 +4,7 @@
 | Product    |                    Hardware Documentation                    |
 | :--------- | :----------------------------------------------------------: |
 | LEC-MTK-I1200 | [Click_here](https://www.adlinktech.com/Products/Computer_on_Modules/SMARC/LEC-MTK-I1200) |
+| OSM-MTK510 | [Click_here](https://www.adlinktech.com/Products/Computer_on_Modules/OSM/OSM-MTK510) |
 
 
 # 2. Adlink Supported Patches
