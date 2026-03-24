@@ -31,6 +31,11 @@ BBLAYERS ?= " \
   ##OEROOT##/../meta-rity/meta-rity-bsp \
   ##OEROOT##/../meta-rity/meta-rity-demo \
   ##OEROOT##/../meta-tensorflow \
-  ##OEROOT##/../meta-browser/meta-chromium \
-  ##OEROOT##/../meta-lts-mixins \
   "
+
+# lec-mtk1200 specific layers
+BBLAYERS += "${@'${TOPDIR}/../src/meta-browser/meta-chromium' if d.getVar('MACHINE') == 'lec-mtk1200' and os.path.exists(d.getVar('TOPDIR') + '/../src/meta-browser/meta-chromium') else ''}"
+BBLAYERS += "${@'${TOPDIR}/../src/meta-lts-mixins' if d.getVar('MACHINE') == 'lec-mtk1200' and os.path.exists(d.getVar('TOPDIR') + '/../src/meta-lts-mixins') else ''}"
+
+# osm-mtk510 specific layer
+BBLAYERS += "${@'${TOPDIR}/../src/meta-qt5' if d.getVar('MACHINE') == 'osm-mtk510' and os.path.exists(d.getVar('TOPDIR') + '/../src/meta-qt5') else ''}"
