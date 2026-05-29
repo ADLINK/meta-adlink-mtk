@@ -8,9 +8,9 @@
 
 # 2. Adlink Supported Patches
 
-- Patches for the MTK-based products for the Adlink dev kit will be found [here](https://github.com/ADLINK/meta-adlink-mtk/tree/rity-kirkstone-v24.1/recipes-kernel/linux/linux-mtk).
+- Patches for the MTK-based products for the Adlink dev kit will be found [here](https://github.com/ADLINK/meta-adlink-mtk/tree/rity-scarthgap-v25.0/recipes-kernel/linux/linux-mtk).
 - The patches that we created and have are based on the MTK Kernel.
-- This patch is based on kernel 5.15.x version.
+- This patch is based on kernel 6.6.x version.
 
 # 3. Software Documentation
 
