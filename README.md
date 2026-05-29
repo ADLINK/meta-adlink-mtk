@@ -16,7 +16,7 @@ You can follow the same steps to build your own customized BSP based on your int
 2. [rity-kirkstone-v23.1](https://github.com/ADLINK/meta-adlink-MTK/tree/rity-kirkstone-v23.1)
 3. [rity-kirkstone-24.0](https://github.com/ADLINK/meta-adlink-mtk/tree/rity-kirkstone-v24.0)(Only for OSM-MTK-510 with EBx carrier)
 4. [rity-kirkstone-v24.1](https://github.com/ADLINK/meta-adlink-MTK/tree/rity-kirkstone-v24.1)
-
+5. [rity-scarthgap-v25.0](https://github.com/ADLINK/meta-adlink-mtk/tree/rity-scarthgap-v25.0)
 
 
 # 3. Adlink Supported Patches
@@ -25,7 +25,7 @@ You can follow the same steps to build your own customized BSP based on your int
 - The patches that we created and have are based on the MTK Kernel.
 - This patch is based on kernel 5.15.x version.
 
+
 # 4. Software Documentation
 
 Refer to the [wiki](https://github.com/ADLINK/meta-adlink-mtk/wiki/Building-Yocto-for-LEC%E2%80%90MTKI1200) page for instructions on building the Yocto .
-
