@@ -55,6 +55,8 @@ EXTRA_KERNEL_PATCHES = " \
         file://0005-Add-read-MAC-address-from-nvmem-support.patch \
         file://0006-Enable-audio-codec-tlv320aic3106.patch \
         file://0007-Add-SKU-and-PCB-INFO.patch \
+        file://OSM-510_CVE-2026-43284_xfrm-esp-fix-shared-skb-decrypt.patch \
+        file://OSM-510_CVE-2026-43284_xfrm-esp-ipv4-fix-up-flags-setting.patch \
 "
 EXTRA_KERNEL_DTS = " \
         file://osm-mtk510.dts \
