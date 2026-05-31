@@ -13,7 +13,8 @@ EXTRA_KERNEL_PATCHES = " \
 	file://0007-Added-PCIe-compliance-test-support.patch \
 	file://0007-Added-support-PCIe-WIFI-BT-Support.patch \
 	file://0011-TLV320-audio-support.patch \
-	file://0011-sound-driver-bind-tlv320.patch \	
+	file://0011-sound-driver-bind-tlv320.patch \
+	file://LEC-MTK-I1200_CVE-2026-43284_xfrm-esp-fix-shared-skb-decrypt.patch \
 	"
 
 EXTRA_KERNEL_DTS = " \
