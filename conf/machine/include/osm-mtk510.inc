@@ -1,6 +1,6 @@
 require conf/machine/include/arm/arch-armv8a.inc
 require conf/machine/include/soc-family.inc
-require conf/machine/include/mediatek-common.inc
+require mediatek-common.inc
 
 SOC_FAMILY = "mt8370"
 
@@ -43,6 +43,7 @@ PREFERRED_PROVIDER_virtual/opencl ?= "libmali"
 
 MACHINEOVERRIDES =. "mt8370:genio-510:"
 # Kernel
+KERNEL_DEFCONFIG = "adlink_osm_mtk510_defconfig"
 KERNEL_CONFIG_AARCH64 = "adlink_osm_mtk510_defconfig"
 KERNEL_DEVICETREE = "mediatek/osm-mtk510.dtb"
 
@@ -53,35 +54,35 @@ EXTRA_KERNEL_PATCHES = " \
         file://0002-Add-TPM-I2C-driver.patch \
         file://0004-init-HDMI-re-driver-at-HDMI-plug.patch \
         file://0005-Add-read-MAC-address-from-nvmem-support.patch \
-        file://0006-Enable-audio-codec-tlv320aic3106.patch \
         file://0007-Add-SKU-and-PCB-INFO.patch \
+        file://0009-DP-direct-output-for-24.1-and-older.patch \
+        file://0001-fsource-add-fsource-driver-to-enable-vefuse.patch \
+        file://0003-Add-RTL8211F-LED-config.patch \
         file://OSM-510_CVE-2026-43284_xfrm-esp-fix-shared-skb-decrypt.patch \
         file://OSM-510_CVE-2026-43284_xfrm-esp-ipv4-fix-up-flags-setting.patch \
+        file://0001-b080uan01-dsi-panel-DCS-init-sequence.patch \
 "
 EXTRA_KERNEL_DTS = " \
         file://osm-mtk510.dts \
+        file://mt8370.dtsi \
 "
 
 KERNEL_SRC_PATCHES ="\
 	${EXTRA_KERNEL_PATCHES} \
 	${EXTRA_KERNEL_DTS} \
 "
-# u-boot
-UBOOT_DTB_NAME = "osm-mtk510.dtb"
-
-# u-boot patches
+# U-Boot patches
 EXTRA_UBOOT_PATCHES = " \
-        file://adlink_osm_mtk510_defconfig \
-        file://board_late_init.cfg \
-       file://0001-Implement-different-dtbo-for-SKU-and-PCB-detection.patch \
+        file://0001-Create-osm-mtk510-machine.patch \
+        file://0002-Implement-different-dtbo-for-SKU-and-PCB-detection.patch \
+        file://0003-sd-card-dts-support.patch \
 "
 
 EXTRA_UBOOT_DTS = " \
         file://osm-mtk510.dts \
 "
+
 UBOOT_SRC_PATCHES = " \
         ${EXTRA_UBOOT_PATCHES} \
         ${EXTRA_UBOOT_DTS} \
 "
-
-
