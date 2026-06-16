@@ -11,5 +11,5 @@ IMAGE_INSTALL:append:lec-mtk1200 = " mtd-utils mdio-tool pciutils canutils atecc
 # Tools
 IMAGE_INSTALL:append:osm-mtk510 = " hdparm mdio-tool pciutils canutils atecc-util eltt2 dhrystone"
 # Extar driver
-IMAGE_INSTALL:append:osm-mtk510 = " rtl8852be-driver rtl8852be-bt-driver"
+IMAGE_INSTALL:append:osm-mtk510 = " rtl8852be-driver rtl8852be-bt-driver "
 
