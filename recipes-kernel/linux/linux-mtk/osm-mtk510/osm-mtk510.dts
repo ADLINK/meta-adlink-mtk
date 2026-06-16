@@ -28,21 +28,21 @@
 	backlight_lcd0: backlight-lcd0 {
 		compatible = "pwm-backlight";
 		pwms = <&disp_pwm0 0 500000>;
-		enable-gpios = <&pio 45 GPIO_ACTIVE_HIGH>;
+	//	enable-gpios = <&pio 45 GPIO_ACTIVE_HIGH>;
 		brightness-levels = <0 1023>;
 		num-interpolated-steps = <1023>;
 		default-brightness-level = <576>;
+		status = "okay";
 	};
 
 	backlight_lcd1: backlight-lcd1 {
 		compatible = "pwm-backlight";
 		pwms = <&disp_pwm1 0 500000>;
+		power-supply = <&edp_panel_fixed_12v>;
 		enable-gpios = <&pio 8 GPIO_ACTIVE_HIGH>;
 		brightness-levels = <0 1023>;
 		num-interpolated-steps = <1023>;
 		default-brightness-level = <576>;
-		default-on;
-		enable-active-high;
 		status = "okay";
 	};
 
@@ -74,28 +74,47 @@
 	   };
 
 
+        edp_panel_fixed_12v: edp-panel-fixed-12v {
+                compatible = "regulator-fixed";
+                regulator-name = "edp_backlight_12v";
+                regulator-min-microvolt = <12000000>;
+                regulator-max-microvolt = <12000000>;
+                enable-active-high;
+                status = "okay";
+        };
 
-	/* edp_panel_fixed_3v3: regulator@0 { */
-	/* 	compatible = "regulator-fixed"; */
-	/* 	regulator-name = "edp_panel_3v3"; */
-	/* 	regulator-min-microvolt = <3300000>; */
-	/* 	regulator-max-microvolt = <3300000>; */
-	/* 	enable-active-high; */
-	/* 	gpio = <&pio 15 GPIO_ACTIVE_HIGH>; */
-	/* 	pinctrl-names = "default"; */
-	/* 	pinctrl-0 = <&edp_panel_3v3_en_pins>; */
-	/* }; */
+	edp_hdmi_sel_reg: edp-hdmi-sel {
+        	compatible = "regulator-fixed";
+        	regulator-name = "edp_hdmi_sel";
+                regulator-min-microvolt = <3300000>;
+                regulator-max-microvolt = <3300000>;
 
+        	gpio = <&gpio1_expender_i2c0 1 0>;
+        	regulator-always-on;
+	};
+
+	 edp_panel_fixed_3v3: regulator@0 { 
+	 	compatible = "regulator-fixed"; 
+	 	regulator-name = "edp_panel_3v3"; 
+	 	regulator-min-microvolt = <3300000>; 
+	 	regulator-max-microvolt = <3300000>;
+	 	enable-active-high;
+		vin-supply  = <&gpio1_expender_i2c0 1 GPIO_ACTIVE_LOW>;
+	// 	gpio = <&pio 15 GPIO_ACTIVE_HIGH>; 
+	// 	pinctrl-names = "default"; 
+	// 	pinctrl-0 = <&edp_panel_3v3_en_pins>;
+		status = "okay";
+	 }; 
 
 	edp_panel: panel {
 			// pinctrl-names = "default";
-			compatible = "lg,lp156ud1";
-			backlight = <&backlight_lcd1>;
-			label = "BOE NE135FBMN41 (WIP)";
-			width-mm = <285>;
-			height-mm = <190>;
-			// enable-gpios = <&pio 111 GPIO_ACTIVE_HIGH>;
-			status = "okay";
+			compatible = "innolux,hk173vb-01b";
+			power-supply = <&edp_panel_fixed_3v3>;
+                        backlight = <&backlight_lcd1>;
+                        width-mm = <350>;
+                        height-mm = <216>;
+	//		label = "BOE NE135FBMN41 (WIP)";
+			status = "disabled";
 
 			port {
 					panel_in: endpoint {
@@ -103,7 +122,7 @@
 					};
 			};
 	};
-
+	
 
 	memory@40000000 {
 		device_type = "memory";
@@ -291,7 +310,8 @@
 		regulator-name = "sdio_card";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		enable-active-high;
+		//gpio = <&gpio1_expender_i2c0 8 GPIO_ACTIVE_HIGH>;
+		//enable-active-high;
 		regulator-always-on;
 	};
 
@@ -301,26 +321,48 @@
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
 		enable-active-high;
+		startup-delay-us = <200000>;
+
+	};
+
+	reg_tpm_rst: regulator-tmp {
+		compatible = "regulator-fixed";
+		regulator-name = "TPM_RST";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+        //GPIO_B_1 , TPM_RSTB_N
+		gpio =  <&pio 13 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
 		regulator-always-on;
 	};
 
-	reg_wifipd_en: regulator-wifipd-en {
-		compatible = "regulator-fixed";
-		regulator-name = "wifipd-en";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio1_expender_i2c0 8 GPIO_ACTIVE_HIGH>;
+	// reg_wifipd_en: regulator-wifipd-en {
+	// 	compatible = "regulator-fixed";
+	// 	regulator-name = "wifipd-en";
+	// 	regulator-min-microvolt = <3300000>;
+	// 	regulator-max-microvolt = <3300000>;
+	// 	gpio = <&gpio1_expender_i2c0 8 GPIO_ACTIVE_HIGH>;
+	// 	enable-active-high;
+    // 	regulator-always-on;
+	// };
+
+	dsi0_en_mux: dsi0-en-mux {
+        	compatible = "regulator-fixed";
+        	regulator-name = "lcm0_dsi_mux_select";
+        	regulator-min-microvolt = <3300000>;
+        	regulator-max-microvolt = <3300000>;
+        	gpio = <&gpio1_expender_i2c0 2 0>;
 		enable-active-high;
-    	regulator-always-on;
+    	};
+	dsi0_en: dsi0-en {
+		compatible = "regulator-fixed";
+		regulator-name = "lcm0_dsi_power_en";
+		gpio = <&pio 111 0>;
+		enable-active-high;
+		vin-supply = <&dsi0_en_mux>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&dsi0_en_pins_default>;
 	};
-	/* dsi0_en: dsi0-en { */
-	/* 	compatible = "regulator-fixed"; */
-	/* 	regulator-name = "lcm1_en"; */
-	/* 	enable-active-high; */
-	/* 	gpio = <&pio 111 GPIO_ACTIVE_HIGH>; */
-	/* 	pinctrl-names = "default"; */
-	/* 	pinctrl-0 = <&dsi0_en_pins_default>; */
-	/* }; */
 
 	amic_codec: amic-codec {
 		#sound-dai-cells = <0>;
@@ -394,6 +436,13 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&usd_pins_pwrseq>;
 		reset-gpios = <&pio 4 1>;
+		post-power-on-delay-ms = <200>;
+	};
+
+	mwifiex_pwrseq: mwifiex-pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		status = "okay";
+		reset-gpios = <&gpio1_expender_i2c0 8 1>;
 		post-power-on-delay-ms = <200>;
 	};
 
@@ -546,7 +595,7 @@
 	phy-mode ="rgmii-id";
 	phy-handle = <&ethernet_phy0>;
 	/* snps,reset-gpio = <&pio 13 GPIO_ACTIVE_HIGH>; */
-	/* snps,reset-delay-us = <0 10000 10000>; */
+	snps,reset-delay-us = <0 10000 10000>;
 	mediatek,tx-delay-ps = <2030>;
 	mediatek,mac-wol;
 	pinctrl-names = "default", "sleep";
@@ -571,15 +620,15 @@
 };
 
 &dp_intf1 {
-	status = "disabled";
-	mediatek,oob-hpd;
-	ports {
-		port {
-			dp_intf1_out: endpoint {
-				remote-endpoint = <&dptx_in>;
-			};
+status = "disabled";
+mediatek,oob-hpd;
+ports {
+	port {
+		dp_intf1_out: endpoint {
+			remote-endpoint = <&dptx_in>;
 		};
 	};
+};
 };
 
 &dp_tx {
@@ -593,9 +642,9 @@
 		port {
 			dptx_in: endpoint {
 				remote-endpoint = <&dp_intf1_out>;
+				};
 			};
 		};
-	};
 };
 
 &edp_tx {
@@ -617,7 +666,8 @@
                 port@1 {
                         reg = <1>;
                         edp_out: endpoint {
-						remote-endpoint = <&panel_in>;
+                                                remote-endpoint = <&panel_in>;
+						data-lanes = <0 1 2 3>;
                         };
                 };
         };
@@ -634,33 +684,38 @@
         };
 };
 
-
 &dsi0 {
-        status = "okay";
+	status = "disabled";
         #address-cells = <1>;
         #size-cells = <0>;
         poweron-in-hs-mode = <0>;
-        dsi_panel@0 {
-			pinctrl-names = "default";
-			pinctrl-0 = <&panel_pins_default>;
-			compatible = "auo,b080uan01";
-			reg = <0>;
-			enable-gpios = <&pio 111 GPIO_ACTIVE_HIGH>;
-			backlight = <&backlight_lcd0>;
-			status = "okay";
-			port {
-				dsi_panel_in: endpoint {
-					remote-endpoint = <&dsi_out>;
-				};
-			};
-        };
-        ports {
-			port {
-				dsi_out: endpoint {
-					remote-endpoint = <&dsi_panel_in>;
-				};
-			};
-        };
+
+	panel@0 {
+                  compatible = "auo,b080uan01";
+                  status = "disabled";
+                  reg = <0>;
+		  reset-gpios = <&pio 25 1>;
+		  enable-gpios = <&pio 45 0>;
+                  pinctrl-names = "default";
+                  pinctrl-0 = <&panel_pins_default>;
+                  power-supply = <&dsi0_en>;
+		  backlight = <&backlight_lcd0>;
+                  prepare-delay-ms = <150>;
+                  init-delay-ms = <50>;
+	       port {
+                           panel0_in: endpoint {
+                                      remote-endpoint = <&dsi0_out>;
+                                        };
+                                };
+                        };
+
+               ports {
+                           port {
+                                        dsi0_out: endpoint {
+                                                remote-endpoint = <&panel0_in>;
+                                        };
+                                };
+                        };
 };
 
 &pwm {
@@ -678,7 +733,7 @@
 &disp_pwm1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&disp_pwm1_pin_default>;
-	status = "okay";
+	status = "disabled";
 };
 
 &dmic_codec {
@@ -697,19 +752,27 @@
 			line-name = "GPIO_00";
 	};
 
-	/* gpio_01 { */
-	/* 		gpio-hog; */
-	/* 		gpios = <1 GPIO_ACTIVE_HIGH>; */
-	/* 		output-high; */
-	/* 		line-name = "GPIO_01"; */
-	/* }; */
+	 cam0_rst_0 { 
+	 		gpio-hog; 
+	 		gpios = <19 GPIO_ACTIVE_HIGH>; 
+	 		output-high; 
+	 		line-name = "cam0rst0"; 
+	 }; 
 
-	/* gpio_02 { */
-	/* 		gpio-hog; */
-	/* 		gpios = <71 GPIO_ACTIVE_HIGH>; */
-	/* 		output-high; */
-	/* 		line-name = "GPIO_02"; */
-	/* }; */
+	 cam0_pdn_0 {
+	 		gpio-hog; 
+	 		gpios = <18 GPIO_ACTIVE_HIGH>; 
+	 		output-high; 
+	 		line-name = "cam0pdn0"; 
+	 };
+
+	  gpio_71 {
+                        gpio-hog;
+                        gpios = <71 GPIO_ACTIVE_HIGH>;
+                        output-high;
+                        line-name = "sx150x_rst";
+         };
+
 
 	/* gpio_03 { 				//MOSM use it for M.2 Wifi reset */
 	/* 		gpio-hog; */
@@ -846,14 +909,14 @@
 				 <PINMUX_GPIO124__FUNC_I0_PCM_DI>;
 		};
 	};
-
-	/* edp_panel_3v3_en_pins: edp-panel-3v3-en-pins { */
-	/* 	pins1 { */
-	/* 		pinmux = <PINMUX_GPIO15__FUNC_B_GPIO15>; */
-	/* 		output-high; */
-	/* 	}; */
-	/* }; */
-
+/*
+	 edp_panel_3v3_en_pins: edp-panel-3v3-en-pins { 
+	 	pins1 { 
+	 		pinmux = <PINMUX_GPIO15__FUNC_B_GPIO15>; 
+	 		output-high; 
+	 	}; 
+	 }; 
+*/
 	dptx_pin: dptx-pin {
 		pins-cmd-dat {
 			pinmux = <PINMUX_GPIO46__FUNC_I0_DP_TX_HPD>;
@@ -1040,31 +1103,28 @@
 			mediatek,drive-strength-adv = <7>;
 		};
 	};
-
+	
 	panel_pins_default: panel-pins-default {
 		/* panel-dcdc { */
 		/* 	pinmux = <PINMUX_GPIO45__FUNC_B_GPIO45>; */
 		/* 	output-low; */
 		/* }; */
-		pins-enable {
-			pinmux = <PINMUX_GPIO111__FUNC_B_GPIO111>;
-		};
-		// pins-rst {
-		// 	pinmux = <PINMUX_GPIO25__FUNC_B_GPIO25>;
-		// 	output-high;
-		// };
+		pins-cmd-dat {
+		 	pinmux = <PINMUX_GPIO25__FUNC_B_GPIO25>;
+		 	output-high;
+		 };
 		pins-te {
 			pinmux = <PINMUX_GPIO26__FUNC_B_GPIO26>;
 			input-enable;
 		};
 	};
 
-	/* dsi0_en_pins_default: dsi0-en-pins-default { */
-	/* 	panel-en { */
-	/* 		pinmux = <PINMUX_GPIO111__FUNC_B_GPIO111>; */
-	/* 		output-low; */
-	/* 	}; */
-	/* }; */
+	dsi0_en_pins_default: dsi0-en-pins-default {
+                panel-en {
+                        pinmux = <PINMUX_GPIO111__FUNC_B_GPIO111>;
+                        output-high;
+                };
+	 };
 
 	edp_pin: edp-pin-default {
 		pins-cmd-dat {
@@ -1076,12 +1136,14 @@
 	disp_pwm0_pin_default: disp-pwm0-pin-default {
 		pins1 {
 			pinmux = <PINMUX_GPIO29__FUNC_O_DISP_PWM0>;
+			output-high;
 		};
 	};
 
 	disp_pwm1_pin_default: disp-pwm1-pin-default {
 		pins1 {
 			pinmux = <PINMUX_GPIO30__FUNC_O_DISP_PWM1>;
+			output-high;
 		};
 	};
 
@@ -1265,8 +1327,7 @@
 	// nor_pins_default: nor-default-pins {
 	// 	pins-ck-io {
 	// 		pinmux = <PINMUX_GPIO125__FUNC_O_SPINOR_CK>,
-	// 			 <PINMUX_GPIO127__FUNC_B0_SPINOR_IO0>,
-	// 			 <PINMUX_GPIO128__FUNC_B0_SPINOR_IO1>;
+	// 			 <PINMUX_GPIO127__FUNC_B0_SPINOR_IO0>;
 	// 		drive-strength = <MTK_DRIVE_8mA>;
 	// 		bias-pull-down;
 	// 	};
@@ -1274,7 +1335,8 @@
 	// 	pins-cs {
 	// 		pinmux = <PINMUX_GPIO126__FUNC_O_SPINOR_CS>,
 	// 			 <PINMUX_GPIO129__FUNC_B0_SPINOR_IO2>,
-	// 			 <PINMUX_GPIO130__FUNC_B0_SPINOR_IO3>;
+	// 			 <PINMUX_GPIO130__FUNC_B0_SPINOR_IO3>,
+	// 			 <PINMUX_GPIO128__FUNC_B0_SPINOR_IO1>;
 	// 		drive-strength = <MTK_DRIVE_8mA>;
 	// 		bias-pull-up;
 	// 	};
@@ -1291,6 +1353,16 @@
 	};
 
 	spi2_pins: spi2-pins {
+		pins-spi {
+			pinmux = <PINMUX_GPIO79__FUNC_O_SPIM2_CSB>,
+				<PINMUX_GPIO80__FUNC_O_SPIM2_CLK>,
+				<PINMUX_GPIO81__FUNC_B0_SPIM2_MOSI>,
+				<PINMUX_GPIO82__FUNC_B0_SPIM2_MISO>;
+			bias-disable;
+		};
+	};
+
+	spi3_pins: spi3-pins {
 		pins-spi {
 			pinmux = <PINMUX_GPIO79__FUNC_O_SPIM2_CSB>,
 				<PINMUX_GPIO80__FUNC_O_SPIM2_CLK>,
@@ -1392,7 +1464,7 @@
 		};
 		reset-pin {
 		    pinmux = <PINMUX_GPIO71__FUNC_B_GPIO71>;
-			output-high;
+		//	output-high;
 		};
 	};
 };
@@ -1407,7 +1479,7 @@
 		/* GPIO Expander 0 Mapping :
 		* - 0: HP_LOP_SEL				=>	Select HP or Lineout
 		* - 1: eDPA_HDMI_SEL			=>	Select eDP or HDMI
-		* - 2: LVDS_DSI_SEL			=>	Select LVDS or DSI
+		* - 2: LVDS_DSI_SEL				=>	Select LVDS or DSI
 		* - 3: LT9611_RST_N_3V			=>	For DSI-HDMI(option) w/ LT9611
 		* - 4: CAN_A_STBY_3V3			=> 	CAN A standby
 		* - 5: CAN_B_STBY_3V3			=>	CAN B standby
@@ -1427,8 +1499,8 @@
 		compatible = "semtech,sx1509q";
 		reg = <0x3e>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&gpio_exp1_pins &edp_hdmi_sel &lvds_dsi_sel &hp_lop_sel>;
-		// pinctrl-0 = <&gpio_exp1_pins &edp_hdmi_sel &lvds_dsi_sel &wifi_pd>;
+		pinctrl-0 = <&gpio_exp1_pins &hp_lop_sel>; 
+	//	pinctrl-0 = <&gpio_exp1_pins &edp_hdmi_sel &hp_lop_sel>;
 		semtech,probe-reset;
 		gpio-controller;
 		interrupt-controller;
@@ -1438,18 +1510,17 @@
 			pins = "gpio0";
 			output-low;
 		};
-		edp_hdmi_sel: gpio1-cfg {
-			pins = "gpio1";
-			output-high;
-		};
-		lvds_dsi_sel: gpio2-cfg {
-			pins = "gpio2";
-			output-high;
-		};
-		// wifi_pd: gpio8-cfg {
-		// 	pins = "gpio8";
-		// 	output-high;
-		// };
+	//	edp_hdmi_sel: gpio1-cfg {
+	//		pins = "gpio1";
+	//		output-high;
+	//		line-name = "edp_hdmi_sel";
+	//	};
+
+	//	lvds_dsi_sel: gpio2-cfg {
+	//		pins = "gpio2";
+	//		output-high;
+	//	};
+
 	};
 	tlv320aic310x: tlv320aic310x@18 {
 		compatible = "ti,tlv320aic3x";
@@ -1597,7 +1668,7 @@
 };
 
 &mipi_tx0 {
-	status = "okay";
+	status = "disabled";
 };
 
 &mmc0 {
@@ -1647,13 +1718,6 @@
 	regulator-enable-ramp-delay = <480>;
 };
 
-//  &wifi_pwrseq { 
-//  	status = "disabled"; 
- 	// pinctrl-names = "default"; 
- 	// pinctrl-0 = <&wifi_pins_pwrseq>; 
-//  	reset-gpios = <&gpio1_expender_i2c0 8 1>; 
-//  	post-power-on-delay-ms = <200>; 
-//  }; 
 
 &mmc2 {							//MOSM use for eMMC or M.2 E Key by jp2 jumper;EB4 used for AW-CM276NF wifi module
 	status = "okay";
@@ -1662,17 +1726,14 @@
 	pinctrl-1 = <&mmc2_pins_uhs>;
 	bus-width = <4>;
 	max-frequency = <200000000>;
-    cap-mmc-highspeed;
-    // mmc-hs200-1_8v;
-    // cap-mmc-hw-reset;
-    // no-sdio;
-    // no-sd;
+	cap-mmc-highspeed;
 	#address-cells = <1>;
 	#size-cells = <0>;
 	non-removable;
 	wakeup-source;
-	vmmc-supply = <&reg_wifipd_en>;
-	// vqmmc-supply = <&sdio_fixed_1v8>;
+	keep-power-in-suspend;
+	vmmc-supply = <&sdio_fixed_3v3>;
+	mmc-pwrseq = <&mwifiex_pwrseq>;
 	mwifiex: mwifiex@1 {
 		compatible = "marvell,sd8997";
 		reg = <1>;
@@ -1688,16 +1749,16 @@
 
 // &nor_flash {
 // 	pinctrl-names = "default";
-// 	pinctrl-0 = <&nor_pins_default>;
+	// pinctrl-0 = <&nor_pins_default>;
 // 	mediatek,pad-select = <0>; // 關鍵：這就是日誌中缺少的屬性
 // 	status = "okay";
 
 // 	flash@0 {
 // 		compatible = "jedec,spi-nor";
 // 		reg = <0>;
-// 		spi-max-frequency = <30000000>;
-// 		// spi-rx-bus-width = <4>;
-// 		// spi-tx-bus-width = <4>;
+// 		spi-max-frequency = <52000000>;
+// 		spi-rx-bus-width = <4>;
+// 		spi-tx-bus-width = <4>;
 // 	};
 // };
 
@@ -1711,7 +1772,7 @@
 	status = "okay";
 
 	spidev@0 {
-		compatible = "mediatek,aiot-board";
+		compatible = "rohm,dh2228fv";
 		spi-max-frequency = <5000000>;
 		reg = <0>;
 	};
@@ -1724,23 +1785,16 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 	status = "okay";
-
-/* CS 腳位設定，依據您的板子實際狀況 */
-    cs-gpios = <&pio 79 GPIO_ACTIVE_LOW>; 
-
-    tpm@0 {
-        /* 關鍵：使用標準 TIS SPI 驅動識別碼 */
-        compatible = "tcg,tpm_tis-spi"; 
-        
-        /* 備用：若舊核心不認得上面那個，可試試 "st,st33htpm-spi" */
-        
-        reg = <0>;  /* 對應 Chip Select 0 */
-        spi-max-frequency = <10000000>; /* 建議先用 10MHz 測試，穩定後可升至 33MHz */
-        
-        /* 若您有接硬體中斷腳 (PIRQ)，請設定在此 (非必須，但效能較好) */
-		interrupt-parent = <&pio>;
-		interrupts = <12 IRQ_TYPE_LEVEL_HIGH>;
+	st33htpm0: st33htpm0@0 {
+		compatible = "st,st33htpm-spi";     
+        reg = <0>; 
+        spi-max-frequency = <1000000>; 
+		spi-cs-setup-delay-ns = <30000>;
+		tpm-supply = <&reg_tpm_rst>;
+		interrupts = <&pio 12 IRQ_TYPE_LEVEL_LOW>;
+		status = "okay";
     };
+
 };
 
 &spmi {
@@ -1920,14 +1974,14 @@
 			sound-dai = <&amic_codec>;
 		};
 
-	/*	codec-2 {
+		codec-2 {
 			sound-dai = <&accdet>;
-		}; */
+		};
 	};
 	dai-link-1 {
 		sound-dai = <&afe>;
 		dai-link-name = "ETDM3_OUT_BE";
-		status = "disabled";
+		status = "okay";
 		codec-0 {
 			sound-dai = <&hdmi0>;
 		};
