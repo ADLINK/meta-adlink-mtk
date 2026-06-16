@@ -116,6 +116,7 @@ SRC_URI:append:osm-mtk510 = " \
         file://gpu-mali.dts \
         file://apusys.dts \
         file://cam-imx214-csi0.dts \
+        file://panel-dsi-b080uan01.dts\
 "
 
 COMPATIBLE_MACHINE = "(osm-mtk510|lec*)"
