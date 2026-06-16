@@ -1,0 +1,79 @@
+From 33b7f7d840cedc70a4f7384f1969ed682b18a472 Mon Sep 17 00:00:00 2001
+From: Tim Liang <tim.liang@adlinktech.com>
+Date: Wed, 5 Feb 2025 09:47:31 +0800
+Subject: [PATCH] Add RTL8211F LED config
+
+---
+ drivers/net/phy/realtek.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index 11be60333fa8..840d9353ccae 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -90,6 +90,33 @@ static int rtl821x_write_page(struct phy_device *phydev, int page)
+ 	return __phy_write(phydev, RTL821x_PAGE_SELECT, page);
+ }
+ 
++static int rtl8211f_config_led(struct phy_device *phydev)
++{
++	int ret;
++	u16 regValue;
++
++	ret = phy_write(phydev, RTL821x_PAGE_SELECT, 0x0d04);
++	if (ret < 0)
++		return ret;
++
++	ret = phy_read(phydev, 0x10);
++	if (ret < 0)
++		return ret;
++	regValue = ret;
++
++	regValue |= (0x5 << 6) | (0xB << 10);
++	regValue &= ~(0x1 << 9);
++
++	dev_info(&phydev->mdio.dev, "RTL8211F LED config: writing reg[0x10] = 0x%04x\n", regValue);
++
++	ret = phy_write(phydev, 0x10, regValue);
++	if (ret < 0)
++		return ret;
++
++	ret = phy_write(phydev, RTL821x_PAGE_SELECT, 0x0);
++	return ret;
++}
++
+ static int rtl821x_probe(struct phy_device *phydev)
+ {
+ 	struct device *dev = &phydev->mdio.dev;
+@@ -408,6 +435,10 @@ static int rtl8211f_config_init(struct phy_device *phydev)
+ 		return ret;
+ 	}
+ 
++	ret = rtl8211f_config_led(phydev);
++	if (ret < 0)
++		return ret;
++
+ 	return genphy_soft_reset(phydev);
+ }
+ 
+@@ -421,7 +452,7 @@ static int rtl821x_resume(struct phy_device *phydev)
+ 
+ 	msleep(20);
+ 
+-	return 0;
++	return rtl8211f_config_led(phydev);
+ }
+ 
+ static int rtl8211e_config_init(struct phy_device *phydev)
+@@ -841,6 +872,8 @@ static irqreturn_t rtl9000a_handle_interrupt(struct phy_device *phydev)
+ 	return IRQ_HANDLED;
+ }
+ 
++
++
+ static struct phy_driver realtek_drvs[] = {
+ 	{
+ 		PHY_ID_MATCH_EXACT(0x00008201),
+-- 
+2.17.1
+
