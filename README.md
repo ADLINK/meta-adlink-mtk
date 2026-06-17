@@ -15,5 +15,5 @@
 
 # 3. Software Documentation
 
-Refer to the [wiki](https://github.com/ADLINK/meta-adlink-mtk/wiki/Building-Yocto-for-LEC%E2%80%90MTKI1200) page for instructions on building the Yocto .
+Refer to the [wiki](https://github.com/ADLINK/meta-adlink-mtk/wiki) page for instructions on building the Yocto .
 
