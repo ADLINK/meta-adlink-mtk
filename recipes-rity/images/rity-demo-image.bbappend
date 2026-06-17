@@ -7,6 +7,9 @@ install_fw() {
 	mkdir -p ${IMAGE_ROOTFS}/lib/firmware/nxp
 	cp ${ADDON_FILES_DIR}/pcieuart8997_combo_v4.bin ${IMAGE_ROOTFS}/lib/firmware/nxp/
 	cp ${ADDON_FILES_DIR}/wifi_mod_para.conf ${IMAGE_ROOTFS}/lib/firmware/nxp/
+        mkdir -p ${IMAGE_ROOTFS}/lib/firmware/mrvl
+        cp ${ADDON_FILES_DIR}/uart8997_bt_v4.bin ${IMAGE_ROOTFS}/lib/firmware/mrvl/
+
 }
 
 modules_load() {
@@ -23,5 +26,5 @@ copy_adlink_prebuilts() {
 ROOTFS_POSTPROCESS_COMMAND += "install_fw; modules_load;"
 
 
-ROOTFS_POSTPROCESS_COMMAND:append:osm-mtk510 += "copy_adlink_prebuilts;"
+ROOTFS_POSTPROCESS_COMMAND:append:osm-mtk510 += " install_fw; copy_adlink_prebuilts;"
 

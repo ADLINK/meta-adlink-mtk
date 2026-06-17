@@ -1,28 +1,29 @@
-From 5bea4346f35478108fa7c5ce8ade4dccede9775a Mon Sep 17 00:00:00 2001
-From: "deepak.s" <deepak.s@adlinktech.com>
-Date: Tue, 17 Mar 2026 16:28:27 +0000
-Subject: [PATCH] final
+From 12f322b711319a5ac779776e3139694a9e482403 Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Fri, 21 Nov 2025 16:10:15 +0800
+Subject: [PATCH] Implement different dtbo for SKU and PCB detection
 
 ---
- board/mediatek/mt8370/mt8370_evk.c | 85 ++++++++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
+ board/mediatek/mt8370/mt8370_evk.c | 84 ++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
 
 diff --git a/board/mediatek/mt8370/mt8370_evk.c b/board/mediatek/mt8370/mt8370_evk.c
-index 889e8dce6a..d269fd804d 100644
+index c671794dee..39581b6a68 100644
 --- a/board/mediatek/mt8370/mt8370_evk.c
 +++ b/board/mediatek/mt8370/mt8370_evk.c
-@@ -12,6 +12,7 @@
+@@ -13,6 +13,7 @@
  #include <linux/kernel.h>
  #include <linux/arm-smccc.h>
- #include <iot_ab.h>
+ #include <splash.h>
 +#include <init.h>
  
  #define MT8370_UPDATABLE_IMAGES	5
  
-@@ -124,3 +125,87 @@ int board_init(void)
+@@ -178,3 +179,86 @@ int board_init(void)
  
  	return 0;
  }
++
 +
 +#define SKU_REG 0x10005230
 +
@@ -35,7 +36,7 @@ index 889e8dce6a..d269fd804d 100644
 +struct sku_info {
 +    uint32_t sku_id;
 +    char* sku_str;
-+       const char* dtbo_file;
++	const char* dtbo_file;
 +};
 +
 +struct sku_info skus[] = {
@@ -45,17 +46,16 @@ index 889e8dce6a..d269fd804d 100644
 +    {20, "OSM-MTK510-2G-32G-CT(100E)", "conf-memory-2G.dtbo"}
 +};
 +
-+#define PCB_REG                0x10005240
-+#define PCB_BIT0       21
-+#define PCB_BIT1       22
-+
++#define PCB_REG		0x10005240
++#define PCB_BIT0	21
++#define PCB_BIT1	22
 +
 +
 +
 +int board_late_init(void)
 +{
-+       char *boot_conf_orig = env_get("boot_conf");
-+       char cmd[256];
++	char *boot_conf_orig = env_get("boot_conf");
++	char cmd[256];
 +
 +    uint32_t sku_id_0 = (*(volatile uint32_t *)SKU_REG >> SKU_BIT0) & 0x1;
 +    uint32_t sku_id_1 = (*(volatile uint32_t *)SKU_REG >> SKU_BIT1) & 0x1;
@@ -69,8 +69,8 @@ index 889e8dce6a..d269fd804d 100644
 +    for (i = 0; i < sizeof(skus)/sizeof(struct sku_info); i++) {
 +        if (skus[i].sku_id == sku_id) {
 +            printf("SKU:   %s\n", skus[i].sku_str);
-+                       snprintf(cmd, sizeof(cmd), "setenv boot_conf '%s#%s'", boot_conf_orig, skus[i].dtbo_file);
-+                       run_command(cmd, 0);
++			snprintf(cmd, sizeof(cmd), "setenv boot_conf '%s#%s'", boot_conf_orig, skus[i].dtbo_file);
++			run_command(cmd, 0);
 +            break;
 +        }
 +    }
@@ -106,7 +106,6 @@ index 889e8dce6a..d269fd804d 100644
 +
 +    return 0;
 +}
-+
 -- 
-2.43.0
+2.34.1
 

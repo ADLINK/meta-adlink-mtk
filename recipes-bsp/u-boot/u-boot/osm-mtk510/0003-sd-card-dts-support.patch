@@ -1,0 +1,79 @@
+diff --git a/arch/arm/dts/osm-mtk510.dts b/arch/arm/dts/osm-mtk510.dts
+index 2d762c9815..6c6e4133a7 100644
+--- a/arch/arm/dts/osm-mtk510.dts
++++ b/arch/arm/dts/osm-mtk510.dts
+@@ -13,6 +13,11 @@
+ 	model = "MediaTek Genio-510 EVK";
+ 	compatible = "mediatek,genio-510-evk", "mediatek,mt8370";
+ 
++	aliases{
++		mmc0 = &mmc0;
++		mmc1 = &mmc1;
++	};
++
+ 	memory@40000000 {
+ 		/* 4GB */
+ 		device_type = "memory";
+@@ -166,6 +171,24 @@
+ 	status = "okay";
+ };
+ 
++&mmc1 {
++    status = "okay";
++    u-boot,dm-pre-reloc; /* This is the most likely missing piece */
++
++    pinctrl-names = "default";
++    pinctrl-0 = <&mmc1_pins_default>;
++    bus-width = <4>;
++    max-frequency = <52000000>;
++    cap-sd-highspeed;
++    /* ADLINK-specific Card Detect */
++    cd-gpios = <&pio 6 GPIO_ACTIVE_LOW>;
++    wp-gpios = <&pio 5 GPIO_ACTIVE_HIGH>;
++    broken-cd;
++
++    vmmc-supply = <&reg_3p3v>;
++    vqmmc-supply = <&reg_3p3v>;
++};
++
+ &pio {
+ 	panel_pins_default: panel-pins-default {
+ 		panel-dcdc {
+@@ -279,6 +302,37 @@
+ 			output-high;
+ 		};
+ 	};
++	mmc1_pins_default: mmc1default {
++    		pins-cmd-dat {
++        		pinmux = <PINMUX_GPIO163__FUNC_B1_MSDC1_CMD>,
++                 		<PINMUX_GPIO165__FUNC_B1_MSDC1_DAT0>,
++                 		<PINMUX_GPIO166__FUNC_B1_MSDC1_DAT1>,
++                 		<PINMUX_GPIO167__FUNC_B1_MSDC1_DAT2>,
++                 		<PINMUX_GPIO168__FUNC_B1_MSDC1_DAT3>;
++        	input-enable;
++        	drive-strength = <MTK_DRIVE_10mA>; /* Match ADLINK's 10mA */
++        	bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
++    		};
++
++    		pins-clk {
++        		pinmux = <PINMUX_GPIO164__FUNC_B1_MSDC1_CLK>;
++        		drive-strength = <MTK_DRIVE_10mA>;
++        		bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
++    		};
++
++    /* ADLINK uses GPIO 6 for Insert/CD */
++    		pins-insert {
++        		pinmux = <PINMUX_GPIO6__FUNC_B_GPIO6>;
++        		bias-pull-up;
++    		};
++
++    /* ADLINK uses GPIO 5 for WP */
++    		pins-wp {
++        		pinmux = <PINMUX_GPIO5__FUNC_B_GPIO5>;
++        		input-enable;
++        		bias-pull-up;
++    		};
++	};
+ };
+ 
+ &i2c0 {

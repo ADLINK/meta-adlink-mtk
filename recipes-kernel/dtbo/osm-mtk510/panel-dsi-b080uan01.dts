@@ -1,0 +1,66 @@
+/dts-v1/;
+#include <dt-bindings/gpio/gpio.h>
+/plugin/;
+
+/ {
+	fragment@0 {
+		target = <&dpi1>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@1 {
+		target = <&hdmi0>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@2 {
+		target = <&hdmi_phy>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@3 {
+		target = <&cec>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@4 {
+		target = <&sound>;
+		__overlay__ {
+			dai-link-1 { /* HDMI */
+				status = "disabled";
+			};
+
+			dai-link-2 { /* DPTX */
+				status = "disabled";
+			};
+		};
+	};
+
+	fragment@5 {
+                target = <&mipi_tx0>;
+                __overlay__ {
+                        status = "okay";
+                };
+        };
+
+	fragment@6 {
+		target = <&dsi0>;
+		__overlay__ {
+			status = "okay";
+
+			panel@0 {
+				status = "okay";
+				mediatek,indicated-display-path = <0>;
+			};
+
+		};
+	};
+};
