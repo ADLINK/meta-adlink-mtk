@@ -39,3 +39,5 @@ BBLAYERS += "${@'${TOPDIR}/../src/meta-lts-mixins' if d.getVar('MACHINE') == 'le
 
 # osm-mtk510 specific layer
 BBLAYERS += "${@'${TOPDIR}/../src/meta-qt5' if d.getVar('MACHINE') == 'osm-mtk510' and os.path.exists(d.getVar('TOPDIR') + '/../src/meta-qt5') else ''}"
+BBLAYERS += "${@'${TOPDIR}/../src/meta-browser/meta-chromium' if d.getVar('MACHINE') == 'osm-mtk510' and os.path.exists(d.getVar('TOPDIR') + '/../src/meta-browser/meta-chromium') else ''}"
+BBLAYERS += "${@'${TOPDIR}/../src/meta-lts-mixins' if d.getVar('MACHINE') == 'osm-mtk510' and os.path.exists(d.getVar('TOPDIR') + '/../src/meta-lts-mixins') else ''}"
