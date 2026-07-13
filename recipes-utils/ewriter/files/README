@@ -1,0 +1,1 @@
+The "efuse_writer" directory is intended for read/write efuse. To make this application work, the eFuse PTA have to be implemented.

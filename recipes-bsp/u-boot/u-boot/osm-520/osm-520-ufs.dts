@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: GPL-2.0 OR MIT
+/*
+ * Copyright (C) 2025 MediaTek Inc.
+ * Author: Macpaul Lin <macpaul.lin@mediatek.com>
+ */
+
+/dts-v1/;
+
+#include "genio-720-evk-common.dtsi"
+
+/ {
+	model = "OSM-520 UFS";
+	compatible = "mediatek,genio-720-evk", "mediatek,mt8391";
+};
+
+&ufshci {
+	status = "okay";
+};
+
+&pio {
+	mmc1_pins_default: mmc1default {
+		pins-cmd-dat {
+			pinmux = <PINMUX_GPIO168__FUNC_MSDC1_CMD>,
+				<PINMUX_GPIO170__FUNC_MSDC1_DAT0>,
+				<PINMUX_GPIO171__FUNC_MSDC1_DAT1>,
+				<PINMUX_GPIO172__FUNC_MSDC1_DAT2>,
+				<PINMUX_GPIO173__FUNC_MSDC1_DAT3>;
+			input-enable;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+		pins-clk {
+			pinmux = <PINMUX_GPIO169__FUNC_MSDC1_CLK>;
+			drive-strength = <MTK_DRIVE_6mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+		pins-insert {
+			pinmux = <PINMUX_GPIO3__FUNC_GPIO3>;
+			bias-pull-up;
+		};
+	};
+};
+
+&mmc1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&mmc1_pins_default>;
+	bus-width = <4>;
+	max-frequency = <52000000>;
+	cap-sd-highspeed;
+	cd-gpios = <&pio 3 GPIO_ACTIVE_LOW>;
+	vmmc-supply = <&mt6359_vpa_buck_reg>;
+	vqmmc-supply = <&mt6359_vsim1_ldo_reg>;
+	status = "okay";
+};

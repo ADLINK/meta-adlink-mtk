@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: GPL-2.0 OR MIT
+/*
+ * Copyright (C) 2025 MediaTek Inc.
+ * Author: Macpaul Lin <macpaul.lin@mediatek.com>
+ */
+
+/dts-v1/;
+
+#include "genio-720-evk-common.dtsi"
+
+/ {
+	model = "OSM-520 eMMC";
+	compatible = "mediatek,genio-720-evk", "mediatek,mt8391";
+};

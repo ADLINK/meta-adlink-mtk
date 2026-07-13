@@ -1,0 +1,13 @@
+diff --git a/src/mt8391/drivers/dramc/lpddr_cal/dramc_pi_main.c b/src/mt8391/drivers/dramc/lpddr_cal/dramc_pi_main.c
+index 019e5dd..2359cf9 100644
+--- a/src/mt8391/drivers/dramc/lpddr_cal/dramc_pi_main.c
++++ b/src/mt8391/drivers/dramc/lpddr_cal/dramc_pi_main.c
+@@ -153,7 +153,7 @@ SAVE_TIME_FOR_CALIBRATION_T SavetimeData;
+ // 0: only 1 freq  , others are multi freq  1: low vcore 2: high vcore
+ U8 gHQA_Test_Freq_Vcore_Level = 0;
+ // 0xFF=all freq by gFreqTbl. The 0x"X" != 0xFF for single freq by gFreqTbl index, ex: 0x3 for DDR3733
+-u8 ett_fix_freq = 0xff;
++u8 ett_fix_freq = 0x3;
+ 
+ extern DRAM_STATUS_T FastK_DramcDCA_MrrMode(DRAMC_CTX_T *p);
+ 

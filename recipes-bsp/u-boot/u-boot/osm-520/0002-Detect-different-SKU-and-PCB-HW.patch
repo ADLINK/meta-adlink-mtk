@@ -1,0 +1,141 @@
+From c26f5e487f8551f6d7cc606b86de757f346c1fcf Mon Sep 17 00:00:00 2001
+From: Haidar Lee <haidar.lee@adlinktech.com>
+Date: Thu, 2 Apr 2026 11:35:06 +0800
+Subject: [PATCH] Detect different SKU and PCB HW
+
+---
+ board/mediatek/genio-720-evk/mt8391_evk.c | 89 ++++++++++++++++++++++-
+ 1 file changed, 87 insertions(+), 2 deletions(-)
+
+diff --git a/board/mediatek/genio-720-evk/mt8391_evk.c b/board/mediatek/genio-720-evk/mt8391_evk.c
+index 5a771a395f..f69be9929d 100644
+--- a/board/mediatek/genio-720-evk/mt8391_evk.c
++++ b/board/mediatek/genio-720-evk/mt8391_evk.c
+@@ -18,6 +18,7 @@
+ #include <linux/kernel.h>
+ #include <linux/sizes.h>
+ #include <linux/arm-smccc.h>
++#include <init.h>
+ 
+ #define MT8391_UPDATABLE_IMAGES	5
+ 
+@@ -63,6 +64,36 @@ enum mt8390_updatable_images {
+ 	MT8391_FIT_IMAGE,
+ };
+ 
++#define SKU_PU_REG 0x11D300B0 
++#define SKU_REG_B0_B1 0x10005210
++#define SKU_REG_B2 0x10005200
++#define SKU_REG_B3_B4 0x10005230
++
++#define SKU_BIT0 29		// 61
++#define SKU_BIT1 30		// 62
++#define SKU_BIT2 10		// 10
++#define SKU_BIT3 12		// 108
++#define SKU_BIT4 13		// 109
++
++struct sku_info {
++    uint32_t sku_id;
++    char* sku_str;
++	const char* dtbo_file;
++};
++
++struct sku_info skus[] = {
++    {0, "OSM-MTK520-4G-64G-ER(000E)", "conf-temp-er.dtbo#conf-memory-4G.dtbo"},
++    {4, "OSM-MTK520-4G-64G-CT(100E)", "conf-memory-4G.dtbo"},
++    {5, "OSM-MTK520-8G-64G-CT/NK(210E)", "conf-memory-8G.dtbo"},
++    {20, "OSM-MTK720-4G-64G-ER(Z00E)", "conf-temp-er.dtbo#conf-memory-4G.dtbo"}
++};
++
++#define PCB_REG		0x10005210
++#define PCB_BIT0	23
++#define PCB_BIT1	24
++
++
++
+ static bool board_is_genio_720_evk(void)
+ {
+ 	return CONFIG_IS_ENABLED(TARGET_MT8391) &&
+@@ -211,16 +242,19 @@ int board_late_init(void)
+ 	char hostname_buf[64] = {0};
+ 	char cmdline_buf[64] = {0};
+ 	enum env_location loc = ENVL_MMC;
++	char *boot_conf_orig = env_get("boot_conf");
++	char cmd[256];
++
+ 
+ 	part = mediatek_sip_part_name();
+ 	switch (part) {
+ 	case 0x8371:
+-		board_name = "genio-520-evk";
++		board_name = "osm-520";
+ 		board_full_name = "MediaTek Genio 520 EVK";
+ 		break;
+ 	case 0x8391:
+ 	default:
+-		board_name = "genio-720-evk";
++		board_name = "osm-720";
+ 		board_full_name = "MediaTek Genio 720 EVK";
+ 		break;
+ 	}
+@@ -251,6 +285,57 @@ int board_late_init(void)
+ 		env_append_bootargs(cmdline_buf);
+ 	}
+ 
++    int32_t reg_32u = *(volatile uint32_t *)SKU_PU_REG;
++    reg_32u &= 0xFFFF77FFF; // clear bit 15 & bit 19
++    *(volatile uint32_t *)SKU_PU_REG = reg_32u;
++
++	uint32_t sku_id_0 = (*(volatile uint32_t *)SKU_REG_B0_B1 >> SKU_BIT0) & 0x1;
++    uint32_t sku_id_1 = (*(volatile uint32_t *)SKU_REG_B0_B1 >> SKU_BIT1) & 0x1;
++    uint32_t sku_id_2 = (*(volatile uint32_t *)SKU_REG_B2 >> SKU_BIT2) & 0x1;
++    uint32_t sku_id_3 = (*(volatile uint32_t *)SKU_REG_B3_B4 >> SKU_BIT3) & 0x1;
++    uint32_t sku_id_4 = (*(volatile uint32_t *)SKU_REG_B3_B4 >> SKU_BIT4) & 0x1;
++
++    uint32_t sku_id = (sku_id_4 << 4) | (sku_id_3 << 3) | (sku_id_2 << 2) | (sku_id_1 << 1) | sku_id_0;
++
++    int i;
++    for (i = 0; i < sizeof(skus)/sizeof(struct sku_info); i++) {
++        if (skus[i].sku_id == sku_id) {
++            printf("SKU:   %s\n", skus[i].sku_str);
++			snprintf(cmd, sizeof(cmd), "setenv boot_conf '%s#%s'", boot_conf_orig, skus[i].dtbo_file);
++			run_command(cmd, 0);
++            break;
++        }
++    }
++
++    if (i == sizeof(skus)/sizeof(struct sku_info)) {
++        printf("Unknown SKU: %d\n", sku_id);
++    }
++
++    uint32_t reg_value;
++
++    uint32_t pcb_id_0 = (*(volatile uint32_t *)PCB_REG >> PCB_BIT0) & 0x1;
++    uint32_t pcb_id_1 = (*(volatile uint32_t *)PCB_REG >> PCB_BIT1) & 0x1;
++
++    uint32_t pcb_id = (pcb_id_1 << 1) | pcb_id_0;
++
++    switch (pcb_id) {
++    case 0:
++        printf("PCB:   PCB A1\n");
++        break;
++    case 1:
++        printf("PCB:   PCB A2\n");
++        break;
++    case 2:
++        printf("PCB:   PCB A3\n");
++        break;
++    case 3:
++        printf("PCB:   PCB A4\n");
++        break;
++    default:
++        printf("Unknown PCB\n");
++        break;
++    }
++
+ 	return 0;
+ }
+ #endif
+-- 
+2.34.1
+

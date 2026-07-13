@@ -1,0 +1,1 @@
+SUBSYSTEM=="net", ACTION=="add", ENV{ID_USB_DRIVER}=="lan78xx", ATTRS{idVendor}=="0424", ATTRS{idProduct}=="7800", NAME="eth1"

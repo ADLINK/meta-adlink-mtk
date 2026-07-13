@@ -1,0 +1,28 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+        fragment@0 {
+            target-path = "/soc/thermal-zones/soc-max";
+            __overlay__ {
+                sustainable-power = <5000>;
+            };
+        };
+
+        fragment@1 {
+        target-path = "/soc/thermal-zones/soc-max/trips";
+        __overlay__ {
+            trip-point@0 {
+                temperature = <75000>;
+            };
+            target@1 {
+                temperature = <100000>;
+            };
+            soc-max-crit@0 {
+                temperature = <115000>;
+            };
+        };
+
+    };
+
+};

@@ -1,0 +1,1 @@
+SUBSYSTEM=="net", ACTION=="add", KERNELS=="1101a000.ethernet", DRIVERS=="dwmac-mediatek", NAME="eth0"

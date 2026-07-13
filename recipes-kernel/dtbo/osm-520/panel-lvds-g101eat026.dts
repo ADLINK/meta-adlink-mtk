@@ -1,0 +1,141 @@
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/pwm/pwm.h>
+
+/ {
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			panel@0 {
+				// compatible = "auo,g101eat026";
+				// reg = <0>;
+				// power-supply = <&dsi0_pp3300>;
+				// pinctrl-names = "default";
+				// status = "okay";
+				// backlight = <&backlight_lcd0>;
+
+
+				compatible = "koe,tx18d204vm0baa";
+				reg = <0>;
+				blen-gpios = <&pio 13 0>;
+				pp3300-supply = <&dsi0_pp3300>;
+				pinctrl-names = "default";
+				status = "okay";
+				backlight = <&backlight_lcd0>;
+
+
+				// width-mm = <217>;  // 216.96mm
+				// height-mm = <136>; // 135.60mm
+
+				// data-mapping = "vesa-24";
+
+				// panel-timing {
+				// 	// Clock: Typ 71.1 MHz (Range 68.9 - 74.5)
+				// 	clock-frequency = <71100000>;
+
+				// 	// Horizontal: Active 1280, Total 1440 (Blanking 160)
+				// 	hactive = <1280>;
+				// 	hfront-porch = <80>; // Blanking
+				// 	hback-porch = <60>;  //  Blanking
+				// 	hsync-len = <20>;    // DE Mode
+
+				// 	// Vertical: Active 800, Total 823 (Blanking 23)
+				// 	vactive = <800>;
+				// 	vfront-porch = <10>; //  Blanking
+				// 	vback-porch = <10>;  //  Blanking
+				// 	vsync-len = <3>;     // DE Mode
+
+				// 	hsync-active = <0>;
+				// 	vsync-active = <0>;
+				// 	de-active = <1>;
+				// 	pixelclk-active = <1>;
+				// };
+
+
+				port {
+					lvds_panel_in: endpoint {
+						remote-endpoint = <&lvds_out>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&disp_dvo2>;
+		__overlay__ {
+			status = "okay";
+			ports {
+				port {
+					lvds_dvo_out: endpoint {
+						remote-endpoint = <&lvds_in>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <&lvds_tx>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@3 {
+		target = <&lvds>;
+		__overlay__ {
+			status = "okay";
+			ports {
+				port@0 {
+					reg = <0>;
+					lvds_in: endpoint {
+						remote-endpoint = <&lvds_dvo_out>;
+					};
+				};
+				port@1 {
+					reg = <1>;
+					lvds_out: endpoint {
+						remote-endpoint = <&lvds_panel_in>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@4 {
+		target = <&backlight_lcd0>;
+		__overlay__ {
+			pwms = <&disp_pwm0 0 500000 0>;
+		};
+	};
+
+	fragment@5 {
+		target = <&disp_pwm0>;
+		__overlay__ {
+			#pwm-cells = <3>;
+		};
+	};
+
+	fragment@6 {
+		target = <&dsi0>;
+		__overlay__ {
+		    status = "disabled";
+		};
+	};
+
+	fragment@7 {
+		target = <&mipi_tx_config0>;
+		__overlay__ {
+    		status = "disabled";
+		};
+	};
+
+	// fragment@8 {
+	// 	target = <&lvds_dsi_sel>;
+	// 	__overlay__ {
+	// 		output-high;
+	// 	};
+	// };
+};

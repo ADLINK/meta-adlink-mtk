@@ -1,0 +1,25 @@
+From 113116586e1bdb71d6ff4dfd3f81fa6cd6c81ca4 Mon Sep 17 00:00:00 2001
+From: Haidar Lee <haidar.lee@adlinktech.com>
+Date: Wed, 28 Jan 2026 16:48:53 +0800
+Subject: [PATCH] Add DP direct output for V25.1 kernel 6.6.92
+
+---
+ drivers/gpu/drm/mediatek/mtk_dp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_dp.c b/drivers/gpu/drm/mediatek/mtk_dp.c
+index f384a2ce1d59..b38bb38264ca 100644
+--- a/drivers/gpu/drm/mediatek/mtk_dp.c
++++ b/drivers/gpu/drm/mediatek/mtk_dp.c
+@@ -2852,7 +2852,7 @@ static const struct drm_bridge_funcs mtk_dp_bridge_funcs = {
+ 	.mode_valid = mtk_dp_bridge_mode_valid,
+ 	.edid_read = mtk_dp_edid_read,
+ 	.detect = mtk_dp_bdg_detect,
+-	.hpd_notify = mtk_dp_bridge_hpd_notify,
++	// .hpd_notify = mtk_dp_bridge_hpd_notify,
+ };
+ 
+ static void mtk_dp_debounce_timer(struct timer_list *t)
+-- 
+2.34.1
+

@@ -1,0 +1,25 @@
+From a097eb5a365796c51569bc088aa8721f9ab09a08 Mon Sep 17 00:00:00 2001
+From: Craig Chen <craig.chen@adlinktech.com>
+Date: Thu, 2 Apr 2026 10:55:21 +0800
+Subject: [PATCH 13/13] modify-i2sout0-share-i2sin0-clock
+
+---
+ sound/soc/mediatek/mt8189/mt8189-dai-i2s.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sound/soc/mediatek/mt8189/mt8189-dai-i2s.c b/sound/soc/mediatek/mt8189/mt8189-dai-i2s.c
+index bc8992dc2d25..26d6dcefa985 100644
+--- a/sound/soc/mediatek/mt8189/mt8189-dai-i2s.c
++++ b/sound/soc/mediatek/mt8189/mt8189-dai-i2s.c
+@@ -1855,7 +1855,7 @@ static const struct mtk_afe_i2s_priv mt8189_i2s_priv[DAI_I2S_NUM] = {
+ 		.id = MT8189_DAI_I2S_OUT0,
+ 		.mclk_id = MT8189_I2SOUT0_MCK,
+ 		.share_property_name = "i2sout0-share",
+-		.share_i2s_id = -1,
++		.share_i2s_id = MT8189_DAI_I2S_IN0,
+ 	},
+ 	[DAI_I2SOUT1] = {
+ 		.id = MT8189_DAI_I2S_OUT1,
+-- 
+2.34.1
+
