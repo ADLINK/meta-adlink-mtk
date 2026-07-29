@@ -89,7 +89,7 @@
                 regulator-min-microvolt = <3300000>;
                 regulator-max-microvolt = <3300000>;
 
-        	gpio = <&gpio1_expender_i2c0 1 0>;
+        //	gpio = <&gpio1_expender_i2c0 1 0>;
         	regulator-always-on;
 	};
 
@@ -99,7 +99,7 @@
 	 	regulator-min-microvolt = <3300000>; 
 	 	regulator-max-microvolt = <3300000>;
 	 	enable-active-high;
-		vin-supply  = <&gpio1_expender_i2c0 1 GPIO_ACTIVE_LOW>;
+	//		vin-supply  = <&gpio1_expender_i2c0 1 GPIO_ACTIVE_LOW>;
 	// 	gpio = <&pio 15 GPIO_ACTIVE_HIGH>; 
 	// 	pinctrl-names = "default"; 
 	// 	pinctrl-0 = <&edp_panel_3v3_en_pins>;
@@ -592,7 +592,7 @@
 
 
 &eth {
-	phy-mode ="rgmii-id";
+	phy-mode ="rgmii-rxid";
 	phy-handle = <&ethernet_phy0>;
 	/* snps,reset-gpio = <&pio 13 GPIO_ACTIVE_HIGH>; */
 	snps,reset-delay-us = <0 10000 10000>;
@@ -795,12 +795,12 @@ ports {
 	/* 		line-name = "GPIO_05"; */
 	/* }; */
 
-	gpio_06 {
-			gpio-hog;
-			gpios = <20 GPIO_ACTIVE_HIGH>;
-			output-high;
-			line-name = "GPIO_06";
-	};
+	/*gpio_06 {
+	/*		gpio-hog;
+	/*		gpios = <20 GPIO_ACTIVE_HIGH>;
+	/*		output-high;
+	/*		line-name = "GPIO_06";
+	/*};
 
 	/* gpio_07 { */
 	/* 		gpio-hog; */
@@ -1499,7 +1499,7 @@ ports {
 		compatible = "semtech,sx1509q";
 		reg = <0x3e>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&gpio_exp1_pins &hp_lop_sel>; 
+		pinctrl-0 = <&gpio_exp1_pins &hp_lop_sel &edp_hdmi_sel>; 
 	//	pinctrl-0 = <&gpio_exp1_pins &edp_hdmi_sel &hp_lop_sel>;
 		semtech,probe-reset;
 		gpio-controller;
@@ -1510,11 +1510,11 @@ ports {
 			pins = "gpio0";
 			output-low;
 		};
-	//	edp_hdmi_sel: gpio1-cfg {
-	//		pins = "gpio1";
-	//		output-high;
-	//		line-name = "edp_hdmi_sel";
-	//	};
+		edp_hdmi_sel: gpio1-cfg {
+			pins = "gpio1";
+			output-high;
+			line-name = "edp_hdmi_sel";
+		};
 
 	//	lvds_dsi_sel: gpio2-cfg {
 	//		pins = "gpio2";
