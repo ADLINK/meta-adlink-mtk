@@ -592,7 +592,7 @@
 
 
 &eth {
-	phy-mode ="rgmii-id";
+	phy-mode ="rgmii-rxid";
 	phy-handle = <&ethernet_phy0>;
 	/* snps,reset-gpio = <&pio 13 GPIO_ACTIVE_HIGH>; */
 	snps,reset-delay-us = <0 10000 10000>;
