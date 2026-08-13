@@ -9,6 +9,6 @@
 #include "genio-720-evk-common.dtsi"
 
 / {
-	model = "OSM-520 eMMC";
+	model = "OSM-MTK520 eMMC";
 	compatible = "mediatek,genio-720-evk", "mediatek,mt8391";
 };

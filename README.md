@@ -14,4 +14,4 @@
 
 # 3. Software Documentation
 
-Refer to the [wiki](https://github.com/ADLINK/meta-adlink-mtk/wiki) page for instructions on building Yocto for OSM-520.
+Refer to the [wiki](https://github.com/ADLINK/meta-adlink-mtk/wiki) page for instructions on building Yocto for OSM-MTK520.

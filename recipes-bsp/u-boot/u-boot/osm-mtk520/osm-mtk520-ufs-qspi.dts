@@ -9,8 +9,8 @@
 #include "genio-720-evk-common.dtsi"
 
 / {
-	model = "OSM-520 UFS";
-	compatible = "mediatek,genio-720-evk", "mediatek,mt8391";
+	model = "OSM-MTK520 with and QSPI NOR Flash storage";
+	compatible = "mediatek,genio-720-evk-ufs-qspi", "mediatek,mt8391";
 };
 
 &ufshci {
@@ -18,6 +18,24 @@
 };
 
 &pio {
+	snor_pins: snor-pins {
+		pins0 {
+			pinmux = <PINMUX_GPIO152__FUNC_SPINOR_IO0>,
+				 <PINMUX_GPIO150__FUNC_SPINOR_CK>,
+				 <PINMUX_GPIO153__FUNC_SPINOR_IO1>;
+			drive-strength = <MTK_DRIVE_8mA>;
+			bias-pull-down;
+		};
+
+		pins1 {
+			pinmux = <PINMUX_GPIO151__FUNC_SPINOR_CS>,
+				 <PINMUX_GPIO154__FUNC_SPINOR_IO2>,
+				 <PINMUX_GPIO155__FUNC_SPINOR_IO3>;
+			drive-strength = <MTK_DRIVE_8mA>;
+			bias-pull-up;
+		};
+	};
+
 	mmc1_pins_default: mmc1default {
 		pins-cmd-dat {
 			pinmux = <PINMUX_GPIO168__FUNC_MSDC1_CMD>,
@@ -38,6 +56,24 @@
 			pinmux = <PINMUX_GPIO3__FUNC_GPIO3>;
 			bias-pull-up;
 		};
+		pins-pwr {
+			pinmux = <PINMUX_GPIO4__FUNC_GPIO4>;
+			bias-pull-up;
+		};
+	};
+};
+
+&snor {
+	pinctrl-names = "default";
+	pinctrl-0 = <&snor_pins>;
+	status = "okay";
+
+	spi-flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <4>;
+		u-boot,dm-pre-reloc;
 	};
 };
 
@@ -47,7 +83,7 @@
 	bus-width = <4>;
 	max-frequency = <52000000>;
 	cap-sd-highspeed;
-	cd-gpios = <&pio 3 GPIO_ACTIVE_LOW>;
+	cd-gpios = <&pio 3 GPIO_ACTIVE_HIGH>;
 	vmmc-supply = <&mt6359_vpa_buck_reg>;
 	vqmmc-supply = <&mt6359_vsim1_ldo_reg>;
 	status = "okay";

@@ -17,10 +17,10 @@
 # You need to select a specific machine to target the build with. There are a selection
 # of emulated machines available which can boot and run in the QEMU emulator:
 #
-#MACHINE ??= "osm-520-emmc"
-#MACHINE ??= "osm-520-norboot-ufs"
-MACHINE ??= "osm-520-ufs"
-
+#MACHINE ??= "osm-mtk520-emmc"
+#MACHINE ??= "osm-mtk520-norboot-ufs"
+MACHINE ??= "osm-mtk520-ufs"
+#MACHINE ??= "osm-mtk510"
 #
 # Where to place downloads
 #

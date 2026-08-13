@@ -1,0 +1,65 @@
+From 84ee29ebb6852e868063e2a33a8f2ec595b7c030 Mon Sep 17 00:00:00 2001
+From: aravindlal <aravindlal.mh@adlinktech.com>
+Date: Mon, 10 Aug 2026 17:22:31 +0530
+Subject: [PATCH] mt8188 set codec sysclk
+
+---
+ sound/soc/mediatek/mt8188/mt8188-mt6359.c | 41 ++++++++++++++++-------
+ 1 file changed, 28 insertions(+), 13 deletions(-)
+
+diff --git a/sound/soc/mediatek/mt8188/mt8188-mt6359.c b/sound/soc/mediatek/mt8188/mt8188-mt6359.c
+index e73f4384700c..3dc11779ffbd 100644
+--- a/sound/soc/mediatek/mt8188/mt8188-mt6359.c
++++ b/sound/soc/mediatek/mt8188/mt8188-mt6359.c
+@@ -570,20 +570,35 @@ static int mt8188_mt6359_init(struct snd_soc_pcm_runtime *rtd)
+ static int mt8188_etdm_hw_params(struct snd_pcm_substream *substream,
+ 				 struct snd_pcm_hw_params *params)
+ {
+-	struct snd_soc_pcm_runtime *rtd = substream->private_data;
+-	struct snd_soc_card *card = rtd->card;
+-	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(rtd, 0);
+-	unsigned int rate = params_rate(params);
+-	unsigned int mclk_fs_ratio = 128;
+-	unsigned int mclk_fs = rate * mclk_fs_ratio;
+-	int ret;
++        struct snd_soc_pcm_runtime *rtd = substream->private_data;
++        struct snd_soc_card *card = rtd->card;
++        struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(rtd, 0);
++        struct snd_soc_dai *codec_dai;
++        unsigned int rate = params_rate(params);
++        unsigned int mclk_fs_ratio = 128;
++        unsigned int mclk_fs = rate * mclk_fs_ratio;
++        int i, ret;
++
++        /* 1. Configure CPU DAI system clock output */
++        ret = snd_soc_dai_set_sysclk(cpu_dai, 0, mclk_fs, SND_SOC_CLOCK_OUT);
++        if (ret) {
++                dev_err(card->dev, "failed to set CPU sysclk\n");
++                return ret;
++        }
++
++        /* 2. Configure Codec DAI system clock input if a codec is bound to this link */
++        for_each_rtd_codec_dais(rtd, i, codec_dai) {
++                if (codec_dai) {
++                        ret = snd_soc_dai_set_sysclk(codec_dai, 0, mclk_fs, SND_SOC_CLOCK_IN);
++                        if (ret && ret != -ENOTSUPP) {
++                                dev_err(card->dev, "failed to set codec sysclk for %s\n", codec_dai->name);
++                                return ret;
++                        }
++                }
++        }
++
++        return 0;
+ 
+-	ret = snd_soc_dai_set_sysclk(cpu_dai, 0, mclk_fs, SND_SOC_CLOCK_OUT);
+-	if (ret) {
+-		dev_err(card->dev, "failed to set sysclk\n");
+-		return ret;
+-	}
+-	return 0;
+ }
+ static const struct snd_soc_ops mt8188_etdm_ops = {
+ 	.hw_params = mt8188_etdm_hw_params,
+-- 
+2.43.0
+

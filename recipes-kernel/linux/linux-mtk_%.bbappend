@@ -1,11 +1,13 @@
-FILESEXTRAPATHS:prepend:osm-520 := "${THISDIR}/${PN}/osm-520:"
+FILESEXTRAPATHS:prepend:osm-mtk520 := "${THISDIR}/${PN}/osm-mtk520:"
+FILESEXTRAPATHS:prepend:osm-mtk510 := "${THISDIR}/${PN}/osm-mtk510:"
 
 SRC_URI:append = " ${KERNEL_SRC_PATCHES}"
 
 OSM_KERNEL_COMMON_VER = "1v0.0.7"
-LINUX_VERSION_EXTENSION:osm-520-ufs = "-osm-520-ufs-${OSM_KERNEL_COMMON_VER}"
-LINUX_VERSION_EXTENSION:osm-520-emmc = "-osm-520-emmc-${OSM_KERNEL_COMMON_VER}"
-LINUX_VERSION_EXTENSION:osm-520-norboot-ufs = "-osm-520-${OSM_KERNEL_COMMON_VER}"
+LINUX_VERSION_EXTENSION:osm-mtk520-ufs = "-osm-mtk520-ufs-${OSM_KERNEL_COMMON_VER}"
+LINUX_VERSION_EXTENSION:osm-mtk520-emmc = "-osm-mtk520-emmc-${OSM_KERNEL_COMMON_VER}"
+LINUX_VERSION_EXTENSION:osm-mtk520-norboot-ufs = "-osm-mtk520-${OSM_KERNEL_COMMON_VER}"
+LINUX_VERSION_EXTENSION:osm-mtk510 = "-osm-mtk510-3v0.0.0"
 
 
 do_copy_source () {
@@ -99,9 +101,9 @@ do_copy_defconfig () {
 
 }
 
-# OSM-520 handles its defconfig and device trees here instead of the
+# OSM-MTK520 handles its defconfig and device trees here instead of the
 # do_copy_* tasks above (see the anonymous python below).
-do_configure:append:osm-520() {
+do_configure:append:osm-mtk520() {
 	# Handle kernel configuration files.
 	if [ -n "${KERNEL_DEFCONFIG}" ]; then
 		config_file="${WORKDIR}/${KERNEL_DEFCONFIG}"
@@ -147,9 +149,9 @@ do_configure:append:osm-520() {
 python () {
     machine = d.getVar('MACHINE') or ''
 
-    if machine.startswith('osm-520'):
-        # OSM-520 copies its defconfig and device trees in
-        # do_configure:append:osm-520; drop do_copy_source so the dts
+    if machine.startswith('osm-mtk520'):
+        # OSM-MTK520 copies its defconfig and device trees in
+        # do_configure:append:osm-MTK520; drop do_copy_source so the dts
         # Makefile is not also rewritten with CONFIG_ARCH_ADLINK entries.
         bb.build.deltask('do_copy_source', d)
 }

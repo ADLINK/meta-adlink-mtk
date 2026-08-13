@@ -1,0 +1,330 @@
+From 8db6a95b86f75ac5a8a152d0eb86d72b153639cd Mon Sep 17 00:00:00 2001
+From: aravindlal <aravindlal.mh@adlinktech.com>
+Date: Sat, 25 Jul 2026 17:29:55 +0530
+Subject: [PATCH] Add SKU and PCB INFO
+
+---
+ drivers/misc/Kconfig        |   6 +
+ drivers/misc/Makefile       |   1 +
+ drivers/misc/sku_pcb_info.c | 283 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 290 insertions(+)
+ create mode 100644 drivers/misc/sku_pcb_info.c
+
+diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
+index 8b7879dc22a2..73e9106a7ac9 100644
+--- a/drivers/misc/Kconfig
++++ b/drivers/misc/Kconfig
+@@ -562,6 +562,12 @@ config TPS6594_PFSM
+ 	  This driver can also be built as a module.  If so, the module
+ 	  will be called tps6594-pfsm.
+ 
++config ADLINK_SKU_PCB_INFO
++        tristate "ADLINK SKU and PCB Information driver"
++        default n
++        help
++          Say Y here if you want to enable a driver for reading SKU and PCB information.
++    
+ source "drivers/misc/c2port/Kconfig"
+ source "drivers/misc/eeprom/Kconfig"
+ source "drivers/misc/cb710/Kconfig"
+diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
+index 0dd624e42a41..61060bb502ea 100644
+--- a/drivers/misc/Makefile
++++ b/drivers/misc/Makefile
+@@ -69,3 +69,4 @@ obj-$(CONFIG_TPS6594_ESM)	+= tps6594-esm.o
+ obj-$(CONFIG_TPS6594_PFSM)	+= tps6594-pfsm.o
+ 
+ obj-$(CONFIG_ARCH_MEDIATEK)     += mediatek/
++obj-$(CONFIG_ADLINK_SKU_PCB_INFO) += sku_pcb_info.o
+diff --git a/drivers/misc/sku_pcb_info.c b/drivers/misc/sku_pcb_info.c
+new file mode 100644
+index 000000000000..fda5a98095be
+--- /dev/null
++++ b/drivers/misc/sku_pcb_info.c
+@@ -0,0 +1,283 @@
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/device.h>
++#include <linux/fs.h>
++#include <linux/slab.h>
++#include <linux/kobject.h>
++#include <linux/of.h>
++#include <linux/of_gpio.h>
++#include <linux/platform_device.h>
++#include <linux/gpio/consumer.h>
++
++struct sku_info {
++    uint32_t sku_id;
++    char *sku_str;
++};
++
++struct pcb_info {
++    uint32_t pcb_id;
++    char *pcb_str;
++};
++
++struct sysinfo_data {
++    struct kobject *kobj_ref;
++    struct gpio_desc *sku_gpios[5];  /* SKU GPIO */
++    struct gpio_desc *pcb_gpios[2];  /* PCB GPIO */
++    struct sku_info *skus;
++    int sku_count;
++    struct pcb_info *pcbs;
++    int pcb_count;
++    struct platform_device *pdev;
++};
++
++static struct sysinfo_data *sysinfo;
++
++static ssize_t sku_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
++{
++    uint32_t sku_id_0, sku_id_1, sku_id_2, sku_id_3, sku_id_4;
++    uint32_t sku_id;
++    int i;
++
++    sku_id_0 = gpiod_get_value(sysinfo->sku_gpios[0]);
++    if (sku_id_0 < 0) {
++        return sprintf(buf, "Failed to read SKU GPIO 0: %d\n", sku_id_0);
++    }
++    sku_id_1 = gpiod_get_value(sysinfo->sku_gpios[1]);
++    if (sku_id_1 < 0) {
++        return sprintf(buf, "Failed to read SKU GPIO 1: %d\n", sku_id_1);
++    }
++    sku_id_2 = gpiod_get_value(sysinfo->sku_gpios[2]);
++    if (sku_id_2 < 0) {
++        return sprintf(buf, "Failed to read SKU GPIO 2: %d\n", sku_id_2);
++    }
++    sku_id_3 = gpiod_get_value(sysinfo->sku_gpios[3]);
++    if (sku_id_3 < 0) {
++        return sprintf(buf, "Failed to read SKU GPIO 3: %d\n", sku_id_3);
++    }
++    sku_id_4 = gpiod_get_value(sysinfo->sku_gpios[4]);
++    if (sku_id_4 < 0) {
++        return sprintf(buf, "Failed to read SKU GPIO 4: %d\n", sku_id_4);
++    }
++    sku_id = (sku_id_4 << 4) | (sku_id_3 << 3) | (sku_id_2 << 2) | (sku_id_1 << 1) | sku_id_0;
++
++    if (sku_id > 31) {
++        return sprintf(buf, "Invalid SKU ID: %u (out of range)\n", sku_id);
++    }
++
++    for (i = 0; i < sysinfo->sku_count; i++) {
++        if (sysinfo->skus[i].sku_id == sku_id) {
++            return sprintf(buf, "%s\n", sysinfo->skus[i].sku_str);
++        }
++    }
++
++    return sprintf(buf, "Unknown SKU (ID: %u)\n", sku_id);
++}
++
++static ssize_t pcb_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
++{
++    uint32_t pcb_id_0, pcb_id_1;
++    uint32_t pcb_id;
++    int i;
++
++    pcb_id_0 = gpiod_get_value(sysinfo->pcb_gpios[0]);
++    if (pcb_id_0 < 0) {
++        return sprintf(buf, "Failed to read PCB GPIO 0: %d\n", pcb_id_0);
++    }
++    pcb_id_1 = gpiod_get_value(sysinfo->pcb_gpios[1]);
++    if (pcb_id_1 < 0) {
++        return sprintf(buf, "Failed to read PCB GPIO 1: %d\n", pcb_id_1);
++    }
++    pcb_id = (pcb_id_1 << 1) | pcb_id_0;
++
++    if (pcb_id > 3) {
++        return sprintf(buf, "Invalid PCB ID: %u (out of range)\n", pcb_id);
++    }
++
++    for (i = 0; i < sysinfo->pcb_count; i++) {
++        if (sysinfo->pcbs[i].pcb_id == pcb_id) {
++            return sprintf(buf, "%s\n", sysinfo->pcbs[i].pcb_str);
++        }
++    }
++
++    return sprintf(buf, "Unknown PCB (ID: %u)\n", pcb_id);
++}
++
++struct kobj_attribute sku_attr = __ATTR_RO(sku);
++struct kobj_attribute pcb_attr = __ATTR_RO(pcb);
++
++static int sysinfo_probe(struct platform_device *pdev)
++{
++    struct device *dev = &pdev->dev;
++    struct device_node *np = dev->of_node;
++    struct device_node *child, *skus_node, *pcbs_node;
++    int i, count;
++
++    dev_info(dev, "Probing sysinfo driver\n");
++
++    sysinfo = devm_kzalloc(dev, sizeof(*sysinfo), GFP_KERNEL);
++    if (!sysinfo) {
++        dev_err(dev, "Failed to allocate sysinfo data\n");
++        return -ENOMEM;
++    }
++
++    sysinfo->pdev = pdev;
++
++    for (i = 0; i < 5; i++) {
++        dev_info(dev, "Requesting SKU GPIO %d\n", i);
++        sysinfo->sku_gpios[i] = devm_gpiod_get_index(dev, "sku", i, GPIOD_IN);
++        if (IS_ERR(sysinfo->sku_gpios[i])) {
++            dev_err(dev, "Failed to get SKU GPIO %d: %ld\n", i, PTR_ERR(sysinfo->sku_gpios[i]));
++            return PTR_ERR(sysinfo->sku_gpios[i]);
++        }
++    }
++
++    dev_info(dev, "Looking for skus node\n");
++    skus_node = of_get_child_by_name(np, "skus");
++    if (!skus_node) {
++        dev_err(dev, "Failed to find skus node\n");
++        return -EINVAL;
++    }
++
++    count = of_get_child_count(skus_node);
++    if (count == 0) {
++        dev_err(dev, "No SKU entries found\n");
++        of_node_put(skus_node);
++        return -EINVAL;
++    }
++
++    dev_info(dev, "Found %d SKU entries\n", count);
++    sysinfo->skus = devm_kzalloc(dev, count * sizeof(struct sku_info), GFP_KERNEL);
++    if (!sysinfo->skus) {
++        dev_err(dev, "Failed to allocate memory for skus\n");
++        of_node_put(skus_node);
++        return -ENOMEM;
++    }
++    sysinfo->sku_count = count;
++
++    i = 0;
++    for_each_child_of_node(skus_node, child) {
++        dev_info(dev, "Reading SKU entry %d\n", i);
++        if (of_property_read_u32(child, "sku-id", &sysinfo->skus[i].sku_id)) {
++            dev_err(dev, "Failed to read sku-id for entry %d\n", i);
++            of_node_put(skus_node);
++            return -EINVAL;
++        }
++        if (of_property_read_string(child, "sku-name", (const char **)&sysinfo->skus[i].sku_str)) {
++            dev_err(dev, "Failed to read sku-name for entry %d\n", i);
++            of_node_put(skus_node);
++            return -EINVAL;
++        }
++        i++;
++    }
++    of_node_put(skus_node);
++
++    for (i = 0; i < 2; i++) {
++        dev_info(dev, "Requesting PCB GPIO %d\n", i);
++        sysinfo->pcb_gpios[i] = devm_gpiod_get_index(dev, "pcb", i, GPIOD_IN);
++        if (IS_ERR(sysinfo->pcb_gpios[i])) {
++            dev_err(dev, "Failed to get PCB GPIO %d: %ld\n", i, PTR_ERR(sysinfo->pcb_gpios[i]));
++            return PTR_ERR(sysinfo->pcb_gpios[i]);
++        }
++    }
++
++    dev_info(dev, "Looking for pcbs node\n");
++    pcbs_node = of_get_child_by_name(np, "pcbs");
++    if (!pcbs_node) {
++        dev_err(dev, "Failed to find pcbs node\n");
++        return -EINVAL;
++    }
++
++    count = of_get_child_count(pcbs_node);
++    if (count == 0) {
++        dev_err(dev, "No PCB entries found\n");
++        of_node_put(pcbs_node);
++        return -EINVAL;
++    }
++
++    dev_info(dev, "Found %d PCB entries\n", count);
++    sysinfo->pcbs = devm_kzalloc(dev, count * sizeof(struct pcb_info), GFP_KERNEL);
++    if (!sysinfo->pcbs) {
++        dev_err(dev, "Failed to allocate memory for pcbs\n");
++        of_node_put(pcbs_node);
++        return -ENOMEM;
++    }
++    sysinfo->pcb_count = count;
++
++    i = 0;
++    for_each_child_of_node(pcbs_node, child) {
++        dev_info(dev, "Reading PCB entry %d\n", i);
++        if (of_property_read_u32(child, "pcb-id", &sysinfo->pcbs[i].pcb_id)) {
++            dev_err(dev, "Failed to read pcb-id for entry %d\n", i);
++            of_node_put(pcbs_node);
++            return -EINVAL;
++        }
++        if (of_property_read_string(child, "pcb-name", (const char **)&sysinfo->pcbs[i].pcb_str)) {
++            dev_err(dev, "Failed to read pcb-name for entry %d\n", i);
++            of_node_put(pcbs_node);
++            return -EINVAL;
++        }
++        i++;
++    }
++    of_node_put(pcbs_node);
++
++    dev_info(dev, "Creating sysfs node\n");
++    sysinfo->kobj_ref = kobject_create_and_add("sysinfo", kernel_kobj);
++    if (!sysinfo->kobj_ref) {
++        dev_err(dev, "Failed to create sysinfo kobject\n");
++        return -ENOMEM;
++    }
++
++    dev_info(dev, "Creating sku sysfs file\n");
++    if (sysfs_create_file(sysinfo->kobj_ref, &sku_attr.attr)) {
++        dev_err(dev, "Cannot create sku sysfs file\n");
++        kobject_put(sysinfo->kobj_ref);
++        sysinfo->kobj_ref = NULL;
++        return -ENOENT;
++    }
++
++    dev_info(dev, "Creating pcb sysfs file\n");
++    if (sysfs_create_file(sysinfo->kobj_ref, &pcb_attr.attr)) {
++        dev_err(dev, "Cannot create pcb sysfs file\n");
++        sysfs_remove_file(sysinfo->kobj_ref, &sku_attr.attr);
++        kobject_put(sysinfo->kobj_ref);
++        sysinfo->kobj_ref = NULL;
++        return -ENOENT;
++    }
++
++    platform_set_drvdata(pdev, sysinfo);
++    dev_info(dev, "Sysinfo driver probed successfully\n");
++    return 0;
++}
++
++static int sysinfo_remove(struct platform_device *pdev)
++{
++    struct sysinfo_data *sysinfo = platform_get_drvdata(pdev);
++    dev_info(&pdev->dev, "Removing sysinfo driver\n");
++    if (sysinfo && sysinfo->kobj_ref) {
++        kobject_put(sysinfo->kobj_ref);
++        sysinfo->kobj_ref = NULL;
++    }
++    return 0;
++}
++
++static const struct of_device_id sysinfo_of_match[] = {
++    { .compatible = "adlink,sysinfo-driver" },
++    { }
++};
++MODULE_DEVICE_TABLE(of, sysinfo_of_match);
++
++static struct platform_driver sysinfo_driver = {
++    .probe = sysinfo_probe,
++    .remove = sysinfo_remove,
++    .driver = {
++        .name = "sysinfo-driver",
++        .of_match_table = sysinfo_of_match,
++    },
++};
++
++module_platform_driver(sysinfo_driver);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Tim Liang");
++MODULE_DESCRIPTION("A generic Linux driver for SKU and PCB info using GPIO and device tree.");
++MODULE_VERSION("1.2");
+-- 
+2.43.0
+

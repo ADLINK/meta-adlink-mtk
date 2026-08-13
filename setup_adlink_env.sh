@@ -29,7 +29,7 @@ e.g.
 	source setup_adlink_env.sh -b build_mtk -m <MACHINE_NAME> -d /home/adlink/share/downloads -s /home/adlink/share/sstate-cache
 
  -b <BUILD_NAME>	build folder name
- -m <MACHINE_NAME>	options : "osm-520-ufs","osm-520-emmc","osm-520-norboot-ufs";default if -m not used :osm-520-ufs
+ -m <MACHINE_NAME>	options : "osm-mtk520-ufs","osm-mtk520-emmc","osm-mtk520-norboot-ufs","osm-mtk510";default if -m not used :osm-mtk520-ufs
  -d <DOWNLOADS>		pre-downloads folder
  -s <SSTATE>		pre-sstate folder
  -h                     Show help
@@ -62,7 +62,7 @@ export TEMPLATECONF=${PWD}/src/meta-adlink-mtk/conf/templates/default
 source src/poky/oe-init-build-env $BUILD_DIR
 export BUILD_DIR=`pwd`
 export DISTRO=rity-demo
-export MACHINE=${MACHINE:-osm-520-ufs}
+export MACHINE=${MACHINE:-osm-MTK520-ufs}
 export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS DL_DIR SSTATE_DIR"
 grep "NDA" ${BUILD_DIR}/conf/local.conf > /dev/null 2>&1 || echo NDA_BUILD = \"1\" >> ${BUILD_DIR}/conf/local.conf 
 

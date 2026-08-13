@@ -3,7 +3,7 @@
  * Copyright (C) 2023 MediaTek Inc.
  */
 /dts-v1/;
-#include "osm-520_mtk520.dts"
+#include "osm-mtk520.dts"
 
 &ufshci {
         status = "okay";
@@ -20,5 +20,5 @@
 };
 
 / {
-        model = "Adlinktech OSM-520 board with UFS storage";
+        model = "Adlinktech OSM-MTK520 board with UFS storage";
 };

@@ -1,6 +1,7 @@
-FILESEXTRAPATHS:prepend:osm-520 := "${THISDIR}/osm-520:"
+FILESEXTRAPATHS:prepend:osm-mtk520 := "${THISDIR}/osm-mtk520:"
+FILESEXTRAPATHS:prepend:osm-mtk510 := "${THISDIR}/osm-mtk510:"
 
-SRC_URI:remove:osm-520 = " \
+SRC_URI:remove:osm-mtk520 = " \
 	file://camera-common-std.dtsi \
 	file://camera-imx258-csi0-std.dts \
 	file://camera-imx258-csi1-std.dts \
@@ -23,8 +24,33 @@ SRC_URI:remove:osm-520 = " \
 	file://display-edp-fhd.dts \
 	file://display-dp.dts \
 "
+SRC_URI:remove:osm-mtk510 = " \
+        file://camera-imx214-csi1.dts \
+        file://camera-imx214-2lanes-csi0.dts \
+        file://camera-ar0430-ap1302-csi0.dts \
+        file://camera-ar0430-ap1302-csi1.dts \
+        file://camera-ar0830-ap1302-csi0.dts \
+        file://camera-ar0830-ap1302-csi1.dts \
+        file://camera-ar0830-ap1302-2lanes-csi0.dts \
+        file://camera-imx214-csi0-imx214-csi1.dts \
+        file://camera-imx214-csi0-ar0830-ap1302-csi1.dts \
+        file://camera-ar0830-ap1302-csi0-imx214-csi1.dts \
+        file://camera-ar0830-ap1302-csi0-ar0830-ap1302-csi1.dts \
+        file://camera-ar0430-ap1302-csi0-std.dts \
+        file://camera-ar0830-ap1302-csi0-std.dts \
+        file://camera-it6510-csi0-std.dts \
+        file://camera-ar0830-ap1302-dual-std.dts \
+        file://camera-it6510-dual-std.dts \
+        file://camera-ar0830-ap1302-csi0-it6510-csi1-std.dts \
+        file://camera-lt6911uxe-csi0-std.dts \
+        file://camera-lt6911uxe-dual-std.dts \
+        file://camera-ag190c-max9286-csi0-std.dts \
+        file://camera-ag190c-max9286-dual-std.dts \
+        file://camera-imx214-csi0-std.dts \
+        file://camera-imx214-csi1-std.dts \
+"
 
-OSM_520_DTBO_FILES = " \
+OSM_MTK520_DTBO_FILES = " \
 	file://temp-er.dts \
 	file://memory-4G.dts \
 	file://memory-8G.dts \
@@ -38,6 +64,17 @@ OSM_520_DTBO_FILES = " \
 	file://camera-ov5640-dual-std-osm520.dts \
 "
 
-SRC_URI:append:osm-520 = " ${OSM_520_DTBO_FILES}"
+OSM_MTK510_DTBO_FILES = " \
+        file://memory-2G.dts \
+        file://memory-4G.dts \
+        file://memory-8G.dts \
+        file://temp-er.dts \
+        file://video.dts \
+        file://apusys.dts \
+        file://panel-dsi-b080uan01.dts \
+"
 
-COMPATIBLE_MACHINE = "(osm-520.*)"
+SRC_URI:append:osm-mtk520 = " ${OSM_MTK520_DTBO_FILES}"
+SRC_URI:append:osm-mtk510 = " ${OSM_MTK510_DTBO_FILES}"
+
+COMPATIBLE_MACHINE = "(osm-mtk510|osm-mtk520.*)"
