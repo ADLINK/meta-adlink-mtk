@@ -3,7 +3,7 @@ From: Haidar Lee <haidar.lee@adlinktech.com>
 Date: Thu, 15 Jan 2026 16:41:28 +0800
 Subject: [PATCH] Modify RTL8211F LED activity: keep 1G link LED solid under EEE
 
-Configure the RTL8211F LEDs (LCR, Page 0xd04 Reg 0x10) for the OSM-520 and
+Configure the RTL8211F LEDs (LCR, Page 0xd04 Reg 0x10) for the OSM-MTK520 and
 keep the link LED solid while the link is in EEE (802.3az) low-power idle.
 
 By default the PHY blinks the LED during EEE LPI, so the 1G "Green always on"

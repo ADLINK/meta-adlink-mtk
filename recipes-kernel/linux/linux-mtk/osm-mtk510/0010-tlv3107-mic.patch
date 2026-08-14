@@ -1,0 +1,31 @@
+From a879b6dd72a79b5d76f800b16597f452fafccef1 Mon Sep 17 00:00:00 2001
+From: aravindlal <aravindlal.mh@adlinktech.com>
+Date: Tue, 28 Jul 2026 16:43:59 +0530
+Subject: [PATCH] tlv3107 mic
+
+---
+ sound/soc/mediatek/mt8188/mt8188-mt6359.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/sound/soc/mediatek/mt8188/mt8188-mt6359.c b/sound/soc/mediatek/mt8188/mt8188-mt6359.c
+index 872af71be559..e73f4384700c 100644
+--- a/sound/soc/mediatek/mt8188/mt8188-mt6359.c
++++ b/sound/soc/mediatek/mt8188/mt8188-mt6359.c
+@@ -350,6 +350,14 @@ static const struct snd_soc_dapm_route mt8188_mt6359_routes[] = {
+ 	{"I071", NULL, SOF_DMA_DL2},
+ 	{"I020", NULL, SOF_DMA_DL3},
+ 	{"I021", NULL, SOF_DMA_DL3},
++	/*
++     * tlv320aic3107 headset mic (LINE1R differential -> Left/Right PGA Mixer).
++     * The codec "Mic Bias" supply has no kcontrol and is not pulled up by the
++     * codec's own input routes, so power it whenever a capture PGA is active.
++     * Bias voltage comes from the codec DT "ai3x-micbias-vg" property.
++     */
++    {"Left PGA Mixer", NULL, "Mic Bias"},
++    {"Right PGA Mixer", NULL, "Mic Bias"},
+ };
+ 
+ static int mt8188_mt6359_mtkaif_calibration(struct snd_soc_pcm_runtime *rtd)
+-- 
+2.43.0
+

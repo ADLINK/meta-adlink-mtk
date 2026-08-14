@@ -1,15 +1,15 @@
-SUMMARY = "Defines Kernel patches, device tree and defconfig macros for OSM-520"
+SUMMARY = "Defines Kernel patches, device tree and defconfig macros for OSM-MTK520"
 
-MACHINEOVERRIDES =. "osm-520:"
+MACHINEOVERRIDES =. "osm-mtk520:"
 
 # Kernel
-KERNEL_DEFCONFIG = "osm-520_mtk520_defconfig"
-KERNEL_DEVICETREE = "mediatek/osm-520_mtk520.dtb"
+KERNEL_DEFCONFIG = "osm_mtk520_defconfig"
+KERNEL_DEVICETREE = "mediatek/osm-mtk520.dtb"
 
 # kernel patches
 EXTRA_KERNEL_PATCHES = " \
-	file://osm-520_mtk520_defconfig \
-	file://0001-Add-osm-520-support.patch \
+	file://osm_mtk520_defconfig \
+	file://0001-Add-osm-mtk520-support.patch \
 	file://0002-Enable-GPIO-control-node.patch \
 	file://0003-Add-read-MAC-address-from-nvmem-support.patch \
 	file://0007-Add-SKU-and-PCB-INFO.patch \
@@ -21,9 +21,9 @@ EXTRA_KERNEL_PATCHES = " \
 "
 
 EXTRA_KERNEL_DTS = " \
-	file://osm-520_mtk520-ufs.dts \
-	file://osm-520_mtk520.dts \
-	file://osm-520_mtk520_core.dts \
+	file://osm-mtk520-ufs.dts \
+	file://osm-mtk520.dts \
+	file://osm-mtk520-core.dts \
 "
 
 KERNEL_SRC_PATCHES = "\
@@ -33,15 +33,15 @@ KERNEL_SRC_PATCHES = "\
 
 # u-boot defconfigs
 EXTRA_UBOOT_PATCHES = " \
-	file://osm_520_emmc_defconfig \
-	file://osm_520_ufs_defconfig \
-	file://osm_520_ufs_qspi_defconfig \
+	file://osm_mtk520_emmc_defconfig \
+	file://osm_mtk520_ufs_defconfig \
+	file://osm_mtk520_ufs_qspi_defconfig \
 "
 
 EXTRA_UBOOT_DTS = " \
-	file://osm-520-emmc.dts \
-	file://osm-520-ufs.dts \
-	file://osm-520-ufs-qspi.dts \
+	file://osm-mtk520-emmc.dts \
+	file://osm-mtk520-ufs.dts \
+	file://osm-mtk520-ufs-qspi.dts \
 "
 
 UBOOT_SRC_PATCHES = " \

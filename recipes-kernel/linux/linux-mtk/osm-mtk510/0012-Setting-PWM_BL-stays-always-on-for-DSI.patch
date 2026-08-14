@@ -1,0 +1,25 @@
+From 87bdea41de36a4b709d5504b31baa8aa790f9cd5 Mon Sep 17 00:00:00 2001
+From: aravindlal <aravindlal.mh@adlinktech.com>
+Date: Tue, 11 Aug 2026 16:46:46 +0530
+Subject: [PATCH] Setting PWM_BL stays always on for DSI
+
+---
+ drivers/video/backlight/pwm_bl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/video/backlight/pwm_bl.c b/drivers/video/backlight/pwm_bl.c
+index 35c716e9043c..ae90598b15c6 100644
+--- a/drivers/video/backlight/pwm_bl.c
++++ b/drivers/video/backlight/pwm_bl.c
+@@ -445,7 +445,7 @@ static int pwm_backlight_initial_power_state(const struct pwm_bl_data *pb)
+ 	 * assume that another driver will enable the backlight at the
+ 	 * appropriate time. Therefore, if it is disabled, keep it so.
+ 	 */
+-	return active ? FB_BLANK_UNBLANK: FB_BLANK_POWERDOWN;
++	return active ? FB_BLANK_UNBLANK: FB_BLANK_UNBLANK;
+ }
+ 
+ static int pwm_backlight_probe(struct platform_device *pdev)
+-- 
+2.43.0
+

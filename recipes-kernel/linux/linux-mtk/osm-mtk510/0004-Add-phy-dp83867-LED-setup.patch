@@ -1,0 +1,65 @@
+From 48fd93e78b83e23f4f37057df81da9b70bcd94cb Mon Sep 17 00:00:00 2001
+From: aravindlal <aravindlal.mh@adlinktech.com>
+Date: Sat, 25 Jul 2026 17:12:07 +0530
+Subject: [PATCH] Add phy dp83867 LED setup
+
+---
+ drivers/net/phy/dp83867.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
+index e397e7d642d9..b9e1f192c376 100644
+--- a/drivers/net/phy/dp83867.c
++++ b/drivers/net/phy/dp83867.c
+@@ -59,7 +59,8 @@
+ 
+ #define DP83867_SW_RESET	BIT(15)
+ #define DP83867_SW_RESTART	BIT(14)
+-
++#define DP83867_LEDCR1      0x0018
++#define DP83867_LEDCR2      0x0019
+ /* MICR Interrupt bits */
+ #define MII_DP83867_MICR_AN_ERR_INT_EN		BIT(15)
+ #define MII_DP83867_MICR_SPEED_CHNG_INT_EN	BIT(14)
+@@ -913,6 +914,38 @@ static int dp83867_config_init(struct phy_device *phydev)
+ 	if (dp83867->port_mirroring != DP83867_PORT_MIRROING_KEEP)
+ 		dp83867_config_port_mirroring(phydev);
+ 
++    /* LED Configuration for LEC-BASE 2.0 Board */
++    /* Set LED pins' function - set LED_0 1011, LED_1 0110, LED_2 0101, LED_GPIO 1111 */
++    /* LED_0    1011: Link established, blink for transmit or receive activity */
++    /* LED_1    0110: 100 BTX link established */
++    /* LED_2    0101: 1000BT link established */
++    /* LED_GPIO 1111: Reserved */
++    printk("%s: DP83867_LED config\n",__func__);
++    val = phy_read(phydev, DP83867_LEDCR1);
++    if (val < 0)
++        return val;
++
++    if ((val & 0xFFFF) != 0xF56B) {
++        val &= ~0xFFFF;
++        val |= 0xF56B;
++        ret = phy_write(phydev, DP83867_LEDCR1, val);
++        if (ret)
++            return ret;
++    }
++
++    /* Control LED outputs' ability - set LED_0, LED_1, LED_2 active low, LED_GPIO reserve */
++    val = phy_read(phydev, DP83867_LEDCR2);
++    if (val < 0)
++        return val;
++
++    if ((val & 0xFFFF) != 0x0000) {
++        val &= ~0xFFFF;
++        val |= 0x0000;
++        ret = phy_write(phydev, DP83867_LEDCR2, val);
++        if (ret)
++            return ret;
++    }
++
+ 	/* Clock output selection if muxing property is set */
+ 	if (dp83867->set_clk_output) {
+ 		u16 mask = DP83867_IO_MUX_CFG_CLK_O_DISABLE;
+-- 
+2.43.0
+

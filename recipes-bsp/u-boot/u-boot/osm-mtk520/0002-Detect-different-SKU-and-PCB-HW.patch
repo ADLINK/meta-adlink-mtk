@@ -68,7 +68,7 @@ index 5a771a395f..f69be9929d 100644
  	switch (part) {
  	case 0x8371:
 -		board_name = "genio-520-evk";
-+		board_name = "osm-520";
++		board_name = "osm-mtk520";
  		board_full_name = "MediaTek Genio 520 EVK";
  		break;
  	case 0x8391:

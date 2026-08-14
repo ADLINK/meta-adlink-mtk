@@ -1,0 +1,47 @@
+From f9e292ed7de9cc08fa9343c22c66c502ac4563cb Mon Sep 17 00:00:00 2001
+From: aravindlal <aravindlal.mh@adlinktech.com>
+Date: Sun, 9 Aug 2026 20:11:53 +0530
+Subject: [PATCH] b080uan01 dsi panel DCS reboot init sequence
+
+---
+ drivers/gpu/drm/panel/panel-simple.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
+index 0d69098eddd9..16162b5e5df1 100644
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
+@@ -376,6 +376,8 @@ static int panel_simple_prepare(struct drm_panel *panel)
+ static int panel_simple_enable(struct drm_panel *panel)
+ {
+ 	struct panel_simple *p = to_panel_simple(panel);
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(panel->dev);
++        int ret;
+ 
+ 	if (p->enabled)
+ 		return 0;
+@@ -383,6 +385,21 @@ static int panel_simple_enable(struct drm_panel *panel)
+ 	if (p->desc->delay.enable)
+ 		msleep(p->desc->delay.enable);
+ 
++	/* Send DCS init sequence safely when DSI link is active */
++        ret = mipi_dsi_dcs_soft_reset(dsi);
++        if (ret < 0)
++                dev_warn(panel->dev, "soft reset failed (%d)\n", ret);
++        msleep(20);
++
++        ret = mipi_dsi_dcs_exit_sleep_mode(dsi);
++        if (ret < 0)
++                dev_warn(panel->dev, "exit sleep failed (%d)\n", ret);
++        msleep(120);
++
++        ret = mipi_dsi_dcs_set_display_on(dsi);
++        if (ret < 0)
++                dev_warn(panel->dev, "set display on failed (%d)\n", ret);
++
+ 	p->enabled = true;
+ 
+ 	return 0;
+-- 
+2.43.0
+

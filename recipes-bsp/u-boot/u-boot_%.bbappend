@@ -1,10 +1,13 @@
-FILESEXTRAPATHS:prepend:osm-520 := "${THISDIR}/${PN}/osm-520:"
+FILESEXTRAPATHS:prepend:osm-mtk520 := "${THISDIR}/${PN}/osm-mtk520:"
+FILESEXTRAPATHS:prepend:osm-mtk510 := "${THISDIR}/${PN}/osm-mtk510:"
 
-SRC_URI:append:osm-520 = "${UBOOT_SRC_PATCHES}"
+SRC_URI:append:osm-mtk520 = "${UBOOT_SRC_PATCHES}"
 
-SRC_URI:append:osm-520-ufs = " file://0002-Detect-different-SKU-and-PCB-HW.patch"
+SRC_URI:append:osm-mtk520-ufs = " file://0002-Detect-different-SKU-and-PCB-HW.patch"
 
-SRC_URI:append:osm-520-norboot-ufs = " file://0002-Detect-different-SKU-and-PCB-HW.patch"
+SRC_URI:append:osm-mtk520-norboot-ufs = " file://0002-Detect-different-SKU-and-PCB-HW.patch"
+
+SRC_URI:append:osm-mtk510 = "${UBOOT_SRC_PATCHES}"
 
 do_copy_source () {
   configs=$(echo "${UBOOT_MACHINE}" | xargs)
@@ -49,7 +52,8 @@ python () {
 
 OSM_UBOOT_COMMON_VER = "1v0.0.4"
 
-UBOOT_LOCALVERSION:osm-520-ufs = "-osm-520-ufs-${OSM_UBOOT_COMMON_VER}"
-UBOOT_LOCALVERSION:osm-520-emmc = "-osm-520-emmc-${OSM_UBOOT_COMMON_VER}"
-UBOOT_LOCALVERSION:osm-520-norboot-ufs = "-osm-520-${OSM_UBOOT_COMMON_VER}"
+UBOOT_LOCALVERSION:osm-mtk520-ufs = "-osm-mtk520-ufs-${OSM_UBOOT_COMMON_VER}"
+UBOOT_LOCALVERSION:osm-mtk520-emmc = "-osm-mtk520-emmc-${OSM_UBOOT_COMMON_VER}"
+UBOOT_LOCALVERSION:osm-mtk520-norboot-ufs = "-osm-mtk520-${OSM_UBOOT_COMMON_VER}"
+UBOOT_LOCALVERSION:osm-mtk510 = "-osm-mtk510-3v0.0.0"
 
