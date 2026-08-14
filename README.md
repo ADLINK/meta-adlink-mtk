@@ -4,6 +4,7 @@
 | Product | Hardware Documentation |
 | :------ | :--------------------: |
 | OSM-MTK520 | [Click_here](https://www.adlinktech.com/products/computer_on_modules/osm/osm-mtk520) |
+| OSM-MTK-510 | [Click_here](https://www.adlinktech.com/products/computer_on_modules/osm/osm-mtk510?lang=en) |
 
 
 # 2. Adlink Supported Patches
