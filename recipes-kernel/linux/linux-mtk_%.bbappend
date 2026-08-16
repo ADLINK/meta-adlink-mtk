@@ -69,6 +69,7 @@ do_copy_source () {
 
 addtask do_copy_source after do_kernel_configme before do_configure
 
+addtask do_copy_defconfig after do_copy_source before do_configure
 
 do_copy_defconfig () {
 
