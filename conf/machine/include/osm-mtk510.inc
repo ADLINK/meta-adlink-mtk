@@ -83,7 +83,6 @@ EXTRA_KERNEL_PATCHES = " \
         file://0009-b080uan01-dsi-panel-DCS-reboot-init-sequence.patch \
 	file://0010-tlv3107-mic.patch \
         file://0011-mt8188-set-codec-sysclk.patch \
-        file://0012-Setting-PWM_BL-stays-always-on-for-DSI.patch \
 "
 EXTRA_KERNEL_DTS = " \
         file://osm-mtk510.dts \
