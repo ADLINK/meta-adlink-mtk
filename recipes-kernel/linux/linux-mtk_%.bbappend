@@ -7,7 +7,7 @@ OSM_KERNEL_COMMON_VER = "1v0.0.7"
 LINUX_VERSION_EXTENSION:osm-mtk520-ufs = "-osm-mtk520-ufs-${OSM_KERNEL_COMMON_VER}"
 LINUX_VERSION_EXTENSION:osm-mtk520-emmc = "-osm-mtk520-emmc-${OSM_KERNEL_COMMON_VER}"
 LINUX_VERSION_EXTENSION:osm-mtk520-norboot-ufs = "-osm-mtk520-${OSM_KERNEL_COMMON_VER}"
-LINUX_VERSION_EXTENSION:osm-mtk510 = "-osm-mtk510-3v0.0.0"
+LINUX_VERSION_EXTENSION:osm-mtk510 = "-osm-mtk510-3v1.0.0"
 
 
 do_copy_source () {

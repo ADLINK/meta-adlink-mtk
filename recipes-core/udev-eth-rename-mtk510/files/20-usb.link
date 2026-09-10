@@ -1,0 +1,5 @@
+[Match]
+Path=platform-11200000.xhci1-usb*
+
+[Link]
+Name=eth1

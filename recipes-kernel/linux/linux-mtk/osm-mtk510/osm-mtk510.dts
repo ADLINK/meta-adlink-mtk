@@ -831,26 +831,28 @@
 };
 
 &eth {
-	phy-mode ="rgmii-rxid";
-	phy-handle = <&ethernet_phy0>;
-	snps,reset-gpio = <&pio 147 GPIO_ACTIVE_HIGH>;
-	snps,reset-delay-us = <0 10000 10000>;
-	mediatek,tx-delay-ps = <2030>;
-	mediatek,mac-wol;
-	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&eth_default_pins>;
-	pinctrl-1 = <&eth_sleep_pins>;
-	status = "okay";
+        phy-mode ="rgmii-rxid";
+        phy-handle = <&ethernet_phy0>;
+/*      snps,reset-gpio = <&pio 147 GPIO_ACTIVE_HIGH>;  */
+        snps,reset-delay-us = <0 10000 10000>;
+        mediatek,tx-delay-ps = <2030>;
+        mediatek,mac-wol;
+        pinctrl-names = "default", "sleep";
+        pinctrl-0 = <&eth_default_pins>;
+        pinctrl-1 = <&eth_sleep_pins>;
+        nvmem-cells = <&mac_part0 &mac_part1>;
+        nvmem-cell-names = "mac-part0", "mac-part1";
+        status = "okay";
 
-	mdio {
-		compatible = "snps,dwmac-mdio";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		ethernet_phy0: ethernet-phy@5 {
-			compatible = "ethernet-phy-id001c.c916";
-			reg = <0x5>;
-		};
-	};
+        mdio {
+                compatible = "snps,dwmac-mdio";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                ethernet_phy0: ethernet-phy@5 {
+                        compatible = "ethernet-phy-id001c.c916";
+                        reg = <0x5>;
+                };
+        };
 };
 
 &dp_intf1 {

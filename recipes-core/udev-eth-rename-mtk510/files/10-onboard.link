@@ -1,0 +1,5 @@
+[Match]
+Path=platform-11021000.ethernet
+
+[Link]
+Name=eth0
