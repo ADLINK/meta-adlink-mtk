@@ -11,4 +11,4 @@ IMAGE_INSTALL:append:osm-mtk520-ufs = " mwifiex-driver flash-eth1-eeprom"
 IMAGE_INSTALL:append:osm-mtk520-emmc = " mwifiex-driver flash-eth1-eeprom"
 
 #OSM-MTK10
-IMAGE_INSTALL:append:osm-mtk510 = " mwifiex-driver udev-lan7800-rename hdparm dhrystone mmc-utils udev-eth0-rename"
+IMAGE_INSTALL:append:osm-mtk510 = " mwifiex-driver hdparm dhrystone mmc-utils udev-eth-rename-mtk510 usb-lan-load "
