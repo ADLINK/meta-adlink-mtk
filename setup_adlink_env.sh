@@ -64,5 +64,4 @@ export BUILD_DIR=`pwd`
 export DISTRO=rity-demo
 export MACHINE=${MACHINE:-osm-MTK520-ufs}
 export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS DL_DIR SSTATE_DIR"
-grep "NDA" ${BUILD_DIR}/conf/local.conf > /dev/null 2>&1 || echo NDA_BUILD = \"1\" >> ${BUILD_DIR}/conf/local.conf 
 
