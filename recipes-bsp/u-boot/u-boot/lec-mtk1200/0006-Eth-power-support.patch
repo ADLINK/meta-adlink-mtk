@@ -1,0 +1,33 @@
+From 60c0597a386dfd13bea4ce4d76025cc2244ba4a7 Mon Sep 17 00:00:00 2001
+From: "deepak.s" <deepak.s@adlinktech.com>
+Date: Wed, 12 Feb 2025 10:18:05 +0530
+Subject: [PATCH] Eth power support
+
+---
+ drivers/net/dwc_eth_qos.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/net/dwc_eth_qos.c b/drivers/net/dwc_eth_qos.c
+index 5a68047881..64dcad6748 100644
+--- a/drivers/net/dwc_eth_qos.c
++++ b/drivers/net/dwc_eth_qos.c
+@@ -1993,6 +1993,16 @@ static int eqos_probe(struct udevice *dev)
+ 		goto err_remove_resources_tegra;
+ 	}
+ 
++	/* TODO: remove it when power driver is ready
++	 * enable power of ethernet module by write register directly
++	 */
++	eqos->power_regs = dev_read_addr_index(dev, 1);
++	if (eqos->power_regs == FDT_ADDR_T_NONE) {
++		pr_err("dev_read_addr() gpio_regs failed");
++		return -ENODEV;
++	}
++	writel(0xd, eqos->power_regs + 0x344);
++
+ #ifdef CONFIG_DM_ETH_PHY
+ 	eqos->mii = eth_phy_get_mdio_bus(dev);
+ #endif
+-- 
+2.47.1
+
