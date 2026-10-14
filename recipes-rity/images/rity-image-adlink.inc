@@ -12,3 +12,6 @@ IMAGE_INSTALL:append:osm-mtk520-emmc = " mwifiex-driver flash-eth1-eeprom"
 
 #OSM-MTK10
 IMAGE_INSTALL:append:osm-mtk510 = " mwifiex-driver hdparm dhrystone mmc-utils udev-eth-rename-mtk510 usb-lan-load "
+# lec-mkt1200
+IMAGE_INSTALL:append:lec-mtk-i1200-ufs = " mtd-utils mdio-tool pciutils can-utils atecc-util eltt2 update-eth-mac resize-script otg-switch "
+IMAGE_INSTALL:append:lec-mtk-i1200-qspi = " mtd-utils mdio-tool pciutils can-utils atecc-util eltt2 update-eth-mac resize-script otg-switch "

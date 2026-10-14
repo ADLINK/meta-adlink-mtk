@@ -1,0 +1,121 @@
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/pinctrl/mt8195-pinfunc.h>
+
+/ {
+	fragment@0 {
+		target = <&edp_tx>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&edp_pin>;
+			status = "okay";
+
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				port@0 {
+					reg = <0>;
+					edp_in: endpoint {
+					remote-endpoint = <&dp_intf0_out>;
+					};
+				};
+
+				port@1 {
+					reg = <1>;
+					edp_out: endpoint {
+						remote-endpoint = <&panel_in>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&dp_intf0>;
+		__overlay__ {
+			status = "okay";
+			ports {
+				port {
+					dp_intf0_out: endpoint {
+						remote-endpoint = <&edp_in>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@2 {
+		target-path = "/";
+		__overlay__ {
+			edp_panel: panel {
+				compatible = "lg,lp120up1";
+				power-supply = <&edp_panel_fixed_3v3>;
+				backlight = <&backlight_lcd0>;
+				label = "AUO B156ZAN03.0";
+				width-mm = <285>;
+				height-mm = <190>;
+				status = "okay";
+
+				port {
+					panel_in: endpoint {
+						remote-endpoint = <&edp_out>;
+					};
+				};
+			};
+		};
+	};
+
+	fragment@3 {
+		target = <&edp_panel_fixed_3v3>;
+		__overlay__ {
+			regulator-always-on;
+
+			regulator-state-mem {
+				regulator-on-in-suspend;
+			};
+		};
+	};
+
+	fragment@4 {
+		target = <&backlight_lcd0>;
+		__overlay__ {
+			default-on;
+		};
+	};
+
+	fragment@5 {
+		target = <&disp_pwm1>;
+		__overlay__ {
+			status = "okay";
+			pinctrl-names = "default";
+			pinctrl-0 = <&disp_pwm1_pin_default>;
+		};
+	};
+
+	fragment@6 {
+		target = <&pio>;
+		__overlay__ {
+			edp_pin: edp_pin_default {
+				pins_cmd_dat {
+					pinmux = <PINMUX_GPIO7__FUNC_EDP_TX_HPD>;
+					bias-pull-up;
+				};
+			};
+
+			disp_pwm1_pin_default: disp_pwm1_pin_default {
+				pins1 {
+					pinmux = <PINMUX_GPIO104__FUNC_DISP_PWM1>;
+				};
+			};
+		};
+	};
+
+	fragment@7 {
+		target = <&ovl1>;
+		__overlay__ {
+			mediatek,enable-dualpipe;
+		};
+	};
+};

@@ -1,3 +1,4 @@
+FILESEXTRAPATHS:prepend:lec-mtk1200 := "${THISDIR}/files:"
 do_install:append:osm-mtk520 () {
 	echo ${MACHINE} > ${D}${sysconfdir}/hostname
 	echo "127.0.1.1 ${MACHINE}" >> ${D}${sysconfdir}/hosts
@@ -6,5 +7,13 @@ do_install:append:osm-mtk520 () {
 do_install:append:osm-mtk510 () {
         echo ${MACHINE} > ${D}${sysconfdir}/hostname
         echo "127.0.1.1 ${MACHINE}" >> ${D}${sysconfdir}/hosts
+}
+
+do_install:append:lec-mtk1200 () {
+	rm -f ${D}${systemd_system_unitdir}/usbmass.service
+}
+
+do_install:append:lec-mtk1200 () {
+	install -m 0644 ${WORKDIR}/usbgadget.conf ${D}/etc/usbgadget.conf
 }
 

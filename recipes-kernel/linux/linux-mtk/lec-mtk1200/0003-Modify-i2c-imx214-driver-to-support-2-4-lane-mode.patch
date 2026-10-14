@@ -1,0 +1,104 @@
+From e6d6acf42bca643105fdd8ed48db776312af0059 Mon Sep 17 00:00:00 2001
+From: shivaadlink <shivashankar.t@adlinktech.com>
+Date: Tue, 27 Aug 2024 12:37:23 +0530
+Subject: [PATCH] Modify i2c: imx214 driver to support 2/4-lane mode
+
+Signed-off-by: shivaadlink <shivashankar.t@adlinktech.com>
+---
+ drivers/media/i2c/imx214.c | 31 ++++++++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/media/i2c/imx214.c b/drivers/media/i2c/imx214.c
+index 15491179db6c..ea655f68da91 100644
+--- a/drivers/media/i2c/imx214.c
++++ b/drivers/media/i2c/imx214.c
+@@ -297,6 +297,7 @@ struct imx214 {
+ 	struct mutex mutex;
+ 
+ 	bool streaming;
++	unsigned char num_data_lanes;
+ 
+ 	struct i2c_client *client;
+ 	struct v4l2_ctrl *vblank;
+@@ -646,6 +647,10 @@ static const struct reg_8 mode_table_common[] = {
+ 	{IMX214_TABLE_END, 0x00}
+ };
+ 
++static const struct reg_8 reg_2lane[] = {
++	{0x0114, 0x01},
++	{0x0303, 0x04},
++};
+ /*
+  * Declare modes in order, from biggest
+  * to smallest height.
+@@ -1591,6 +1596,13 @@ static int imx214_start_streaming(struct imx214 *imx214)
+ 		dev_err(imx214->dev, "could not sent mode table %d\n", ret);
+ 		goto error;
+ 	}
++	if (imx214->num_data_lanes == 2) {
++		ret = imx214_write_table(imx214, reg_2lane);
++		if (ret < 0) {
++			dev_err(imx214->dev, "could not sent 2-lane mode table %d\n", ret);
++			goto error;
++		}
++	}
+ 	ret = __v4l2_ctrl_handler_setup(&imx214->ctrls);
+ 	if (ret < 0) {
+ 		dev_err(imx214->dev, "could not sync v4l2 controls\n");
+@@ -1655,8 +1667,10 @@ static int imx214_s_stream(struct v4l2_subdev *subdev, int enable)
+ static int imx214_g_mbus_config(struct v4l2_subdev *sd, unsigned int pad,
+ 		struct v4l2_mbus_config *config)
+ {
++	struct imx214 *imx214 = to_imx214(sd);
++
+ 	config->type = V4L2_MBUS_CSI2_DPHY;
+-	config->flags = V4L2_MBUS_CSI2_4_LANE;
++	config->flags = (imx214->num_data_lanes == 2) ? V4L2_MBUS_CSI2_2_LANE : V4L2_MBUS_CSI2_4_LANE;
+ 
+ 	return 0;
+ }
+@@ -1726,7 +1740,7 @@ static int imx214_get_regulators(struct device *dev, struct imx214 *imx214)
+ 				       imx214->supplies);
+ }
+ 
+-static int imx214_parse_fwnode(struct device *dev)
++static int imx214_parse_fwnode(struct device *dev, struct imx214 *imx214)
+ {
+ 	struct fwnode_handle *endpoint;
+ 	struct v4l2_fwnode_endpoint bus_cfg = {
+@@ -1747,6 +1761,9 @@ static int imx214_parse_fwnode(struct device *dev)
+ 		goto done;
+ 	}
+ 
++	imx214->num_data_lanes = bus_cfg.bus.mipi_csi2.num_data_lanes;
++	dev_dbg(dev, "lane number = %u", imx214->num_data_lanes);
++
+ 	for (i = 0; i < bus_cfg.nr_of_link_frequencies; i++)
+ 		if (bus_cfg.link_frequencies[i] == IMX214_DEFAULT_LINK_FREQ)
+ 			break;
+@@ -1811,17 +1828,17 @@ static int imx214_probe(struct i2c_client *client)
+ 	int ret;
+ 	u64 h_blank;
+ 
+-	dev_dbg(&client->dev, "[imx214] %s : %d\n", __func__, __LINE__);
+-	ret = imx214_parse_fwnode(dev);
+-	if (ret)
+-		return ret;
+-
+ 	imx214 = devm_kzalloc(dev, sizeof(*imx214), GFP_KERNEL);
+ 	if (!imx214)
+ 		return -ENOMEM;
+ 
+ 	imx214->dev = dev;
+ 
++	dev_dbg(&client->dev, "[imx214] %s : %d\n", __func__, __LINE__);
++	ret = imx214_parse_fwnode(dev, imx214);
++	if (ret)
++		return ret;
++
+ 	imx214->xclk = devm_clk_get(dev, NULL);
+ 	if (IS_ERR(imx214->xclk)) {
+ 		dev_err(dev, "could not get xclk\n");
+-- 
+2.45.2
+

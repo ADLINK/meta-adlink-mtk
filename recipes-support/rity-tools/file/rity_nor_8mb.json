@@ -1,0 +1,51 @@
+{
+  "rity-tools": {
+    "min-version": "1.3.dev"
+  },
+  "partitions": {
+    "nor0": null,
+    "nor_bl2": "bl2.img",
+    "nor_fip_a": "fip.bin",
+    "nor_fip_b": "fip.bin",
+    "nor_firmware_a": null,
+    "nor_firmware_b": null,
+    "nor_dramk": null,
+    "nor_misc": null,
+    "nor_bootassets": "bootassets.img",
+    "nor_env": "u-boot-env.bin",
+    "mmc0": null,
+    "mmc0boot0": null,
+    "mmc0boot1": null,
+    "bootloaders": null,
+    "bootloaders_b": null,
+    "kernel": "fitImage",
+    "rootfs": null,
+    "modules": null,
+    "firmware": null,
+    "firmware_b": null,
+    "dramk": null,
+    "misc": null,
+    "capsule": "capsule.vfat",
+    "bootassets": null
+  },
+  "groups": {
+    "all": {
+      "erase": ["mmc0", "nor0", "mmc0boot0", "mmc0boot1"],
+      "flash": [
+        "mmc0",
+        "nor_bl2",
+        "nor_fip_a", "nor_fip_b",
+        "nor_bootassets",
+        "nor_env"
+      ]
+    },
+
+    "erase-mmc": {
+      "erase": ["mmc0", "mmc0boot0", "mmc0boot1"]
+    },
+
+    "system": {
+      "flash": ["kernel", "rootfs"]
+    }
+  }
+}

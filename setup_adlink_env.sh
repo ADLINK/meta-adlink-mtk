@@ -18,7 +18,7 @@ done
 
 export OPTIND=1 #reset opt index
 unset DL_DIR
-unset SSTATE_DIR 
+unset SSTATE_DIR
 usage()
 {
     cat << EOF
@@ -29,7 +29,7 @@ e.g.
 	source setup_adlink_env.sh -b build_mtk -m <MACHINE_NAME> -d /home/adlink/share/downloads -s /home/adlink/share/sstate-cache
 
  -b <BUILD_NAME>	build folder name
- -m <MACHINE_NAME>	options : "osm-mtk520-ufs","osm-mtk520-emmc","osm-mtk520-norboot-ufs","osm-mtk510";default if -m not used :osm-mtk520-ufs
+ -m <MACHINE_NAME>	options : "osm-mtk520-ufs","osm-mtk520-emmc","osm-mtk520-norboot-ufs","osm-mtk510","lec-mtk-i1200-ufs","lec-mtk-i1200-qspi";default if -m not used :osm-mtk520-ufs
  -d <DOWNLOADS>		pre-downloads folder
  -s <SSTATE>		pre-sstate folder
  -h                     Show help

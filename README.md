@@ -5,7 +5,7 @@
 | :------ | :--------------------: |
 | OSM-MTK520 | [Click_here](https://www.adlinktech.com/products/computer_on_modules/osm/osm-mtk520) |
 | OSM-MTK-510 | [Click_here](https://www.adlinktech.com/products/computer_on_modules/osm/osm-mtk510?lang=en) |
-
+| LEC-MTK-I1200 | [Click_here](https://www.adlinktech.com/Products/Computer_on_Modules/SMARC/LEC-MTK-I1200) |
 
 # 2. Adlink Supported Patches
 
@@ -15,4 +15,4 @@
 
 # 3. Software Documentation
 
-Refer to the [wiki](https://github.com/ADLINK/meta-adlink-mtk/wiki) page for instructions on building Yocto for OSM-MTK520.
+Refer to the [wiki](https://github.com/ADLINK/meta-adlink-mtk/wiki) page for instructions on building Yocto.
