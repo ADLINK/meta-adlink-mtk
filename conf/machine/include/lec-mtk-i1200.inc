@@ -15,6 +15,7 @@ EXTRA_KERNEL_PATCHES = " \
 	file://0011-TLV320-audio-support.patch \
 	file://0011-sound-driver-bind-tlv320.patch \
 	file://LEC-MTK-I1200_CVE-2026-43284_xfrm-esp-fix-shared-skb-decrypt.patch \
+	file://cve/MTK_510-520-1200_CVE-2026-98432_ipv4-free-inet_opt-and-ireq_opt-after-RCU-grace-period.patch \
 	"
 
 EXTRA_KERNEL_DTS = " \
