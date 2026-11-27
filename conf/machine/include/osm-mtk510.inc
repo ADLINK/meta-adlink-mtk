@@ -83,6 +83,7 @@ EXTRA_KERNEL_PATCHES = " \
         file://0009-b080uan01-dsi-panel-DCS-reboot-init-sequence.patch \
 	file://0010-tlv3107-mic.patch \
         file://0011-mt8188-set-codec-sysclk.patch \
+        file://cve/MTK_510-520-1200_CVE-2026-98432_ipv4-free-inet_opt-and-ireq_opt-after-RCU-grace-period.patch \
 "
 EXTRA_KERNEL_DTS = " \
         file://osm-mtk510.dts \

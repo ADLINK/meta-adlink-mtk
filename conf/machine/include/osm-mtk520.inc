@@ -18,6 +18,7 @@ EXTRA_KERNEL_PATCHES = " \
 	file://0013-modify-i2sout0-share-i2sin0-clock.patch \
 	file://0014-mt8189-aic3107-set-codec-sysclk.patch \
 	file://0015-tlv3107-mic.patch \
+	file://cve/MTK_510-520-1200_CVE-2026-98432_ipv4-free-inet_opt-and-ireq_opt-after-RCU-grace-period.patch \
 "
 
 EXTRA_KERNEL_DTS = " \

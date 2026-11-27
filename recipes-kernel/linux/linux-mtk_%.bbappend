@@ -1,3 +1,4 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 FILESEXTRAPATHS:prepend:osm-mtk520 := "${THISDIR}/${PN}/osm-mtk520:"
 FILESEXTRAPATHS:prepend:osm-mtk510 := "${THISDIR}/${PN}/osm-mtk510:"
 FILESEXTRAPATHS:prepend:lec-mtk1200 := "${THISDIR}/${PN}/lec-mtk1200:"
